@@ -21,6 +21,8 @@ internal sealed class REPOMenuSliderFloat : MonoBehaviour
     internal float min, max, precision;
     internal int decimalPlaces;
     
+    
+    
     private TextMeshProUGUI headerTMP, barTMP, maskedTMP, descriptionTextTMP;
     private MenuSelectableElement menuSelectableElement;
     private RectTransform rectTransform, maskedRectTransform, barRectTransform, barSizeRectTransform;
@@ -34,7 +36,7 @@ internal sealed class REPOMenuSliderFloat : MonoBehaviour
 
     private bool isHovering;
 
-    private bool valueChanged => Mathf.Abs(currentValue - previousValue) >= 0.01;
+    private bool hasValueChanged => Mathf.Abs(currentValue - previousValue) >= 0.01;
     
     internal void Initialize(float defaultValue)
     {
@@ -135,7 +137,7 @@ internal sealed class REPOMenuSliderFloat : MonoBehaviour
             }
         }
         
-        if (!valueChanged)
+        if (!hasValueChanged)
             return;
         
         UpdateBarPosition();
@@ -166,7 +168,7 @@ internal sealed class REPOMenuSliderFloat : MonoBehaviour
         
         currentValue = min + normalized * multiplier;
         
-        if (valueChanged)
+        if (hasValueChanged)
             MenuManager.instance.MenuEffectClick(MenuManager.MenuClickEffectType.Tick, menuPage);
     }
 
