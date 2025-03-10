@@ -15,13 +15,13 @@ internal sealed class REPOMenuSliderFloat : MonoBehaviour
     internal MenuPage menuPage;
     
     internal Action<float> onValueChanged;
+    internal Action<int> onOptionChanged;
+    internal string[] options;
 
     internal string displayPrefix, displayPostfix;
 
     internal float min, max, precision;
     internal int decimalPlaces;
-    
-    
     
     private TextMeshProUGUI headerTMP, barTMP, maskedTMP, descriptionTextTMP;
     private MenuSelectableElement menuSelectableElement;
@@ -48,7 +48,14 @@ internal sealed class REPOMenuSliderFloat : MonoBehaviour
         barTMP = transform.Find("Bar Text").GetComponent<TextMeshProUGUI>();
         maskedRectTransform = (RectTransform) transform.Find("MaskedText");
         maskedTMP = maskedRectTransform.GetComponentInChildren<TextMeshProUGUI>();
+        
         descriptionTextTMP = transform.Find("Big Setting Text").GetComponent<TextMeshProUGUI>();
+        
+        descriptionTextTMP.alignment = TextAlignmentOptions.Center;
+        
+        var descriptionSizeDelta = descriptionTextTMP.rectTransform.sizeDelta; 
+        descriptionTextTMP.rectTransform.sizeDelta = descriptionSizeDelta with { y = descriptionSizeDelta.y - 4f };
+        
         barSizeRectTransform = (RectTransform) transform.Find("BarSize");
 
         var background = transform.Find("SliderBG");
@@ -144,7 +151,11 @@ internal sealed class REPOMenuSliderFloat : MonoBehaviour
         UpdateBarLabel();
         
         previousValue = currentValue;
-        onValueChanged?.Invoke(currentValue);
+        
+        if (options != null)
+            onOptionChanged?.Invoke(Convert.ToInt32(currentValue));
+        else
+            onValueChanged?.Invoke(currentValue);
     }
 
     private void OnHover()
@@ -182,7 +193,9 @@ internal sealed class REPOMenuSliderFloat : MonoBehaviour
 
     private void Increment()
     {
-        var newValue = currentValue + precision * 2f;
+        var increment = options != null ? 1 : precision * 2f;
+        
+        var newValue = currentValue + increment;
         
         if (Math.Abs(max - currentValue) < float.Epsilon)
             newValue = min;
@@ -194,7 +207,9 @@ internal sealed class REPOMenuSliderFloat : MonoBehaviour
     
     private void Decrement()
     {
-        var newValue = currentValue - precision * 2f;
+        var increment = options != null ? 1 : precision * 2f;
+        
+        var newValue = currentValue - increment;
             
         if (Math.Abs(currentValue - min) < float.Epsilon)
             newValue = max;
@@ -206,6 +221,12 @@ internal sealed class REPOMenuSliderFloat : MonoBehaviour
 
     private void UpdateBarLabel()
     {
+        if (options != null)
+        {
+            barTMP.text = maskedTMP.text = (displayPrefix ??= string.Empty) + options[Convert.ToInt32(currentValue)] + (displayPostfix ??= string.Empty);
+            return;
+        }
+        
         var valueAsString = currentValue.ToString(CultureInfo.InvariantCulture);
 
         valueAsString = int.TryParse(valueAsString, out var value) ? value.ToString() : currentValue.ToString($"F{decimalPlaces}", CultureInfo.InvariantCulture);

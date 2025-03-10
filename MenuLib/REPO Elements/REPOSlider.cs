@@ -12,8 +12,11 @@ public sealed class REPOSlider : REPOElement
     public float min { get; private set; }
     public float max { get; private set; }
     public int precision { get; private set; }
+
+    public string[] options { get; private set; }
     
     public Action<float> onValueChanged { get; private set; }
+    public Action<int> onOptionChanged { get; private set; }
     
     internal REPOMenuSliderFloat menuSliderFloat;
     
@@ -28,6 +31,22 @@ public sealed class REPOSlider : REPOElement
         this.max = max;
         this.precision = precision;
         this.defaultValue = defaultValue;
+    }
+    
+    public REPOSlider(string text, string description, Action<int> onOptionChanged, string defaultOption, params string[] options)
+    {
+        this.text = text;
+        this.description = description;
+        this.onOptionChanged = onOptionChanged;
+
+        var defaultValueIndex = Array.IndexOf(options, defaultOption);
+
+        if (defaultValueIndex == -1)
+            defaultValueIndex = 0;
+        
+        defaultValue = defaultValueIndex;
+        this.options = options;
+        max = options.Length - 1f;
     }
     
     public void SetText(string newText)
@@ -81,6 +100,22 @@ public sealed class REPOSlider : REPOElement
         onValueChanged = newOnValueChanged;
     }
     
+    public void SetOnOptionChanged(Action<int> newOnOptionChanged)
+    {
+        if (menuSliderFloat)
+            menuSliderFloat.onOptionChanged = newOnOptionChanged;
+        
+        onOptionChanged = newOnOptionChanged;
+    }
+    
+    public void SetOptions(params string[] newOptions)
+    {
+        if (menuSliderFloat)
+            menuSliderFloat.options = newOptions;
+        
+        options = newOptions;
+    }
+    
     public override RectTransform GetReference() => MenuAPI.sliderTemplate;
     
     public override void SetDefaults()
@@ -96,6 +131,8 @@ public sealed class REPOSlider : REPOElement
         SetMax(max);
         SetPrecision(precision);
         SetOnValueChanged(onValueChanged);
+        SetOnOptionChanged(onOptionChanged);
+        SetOptions(options);
         
         menuSliderFloat.Initialize(defaultValue);
         SetText(text);
