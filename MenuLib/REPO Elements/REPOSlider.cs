@@ -38,6 +38,14 @@ public sealed class REPOSlider : REPOElement
         text = newText;
     }
     
+    public void SetDescription(string newDescription)
+    {
+        if (menuSliderFloat)
+            menuSliderFloat.SetDescriptionText(newDescription);
+        
+        description = newDescription;
+    }
+    
     public void SetMin(float newMin)
     {
         if (menuSliderFloat)
@@ -90,8 +98,8 @@ public sealed class REPOSlider : REPOElement
         SetOnValueChanged(onValueChanged);
         
         menuSliderFloat.Initialize(defaultValue);
-        menuSliderFloat.SetHeader(text);
-        menuSliderFloat.SetDescriptionText(description);
+        SetText(text);
+        SetDescription(description);
         
         afterBeingParented = menuPage =>
         {
