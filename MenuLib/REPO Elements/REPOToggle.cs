@@ -82,7 +82,7 @@ public sealed class REPOToggle : REPOElement
         menuTwoOptions.customEvents = true;
         menuTwoOptions.settingSet = false;
 
-        toggleTextTMP.rectTransform.sizeDelta = toggleTextTMP.rectTransform.sizeDelta with { y = toggleTextTMP.rectTransform.sizeDelta.y - 2};
+        toggleTextTMP.rectTransform.sizeDelta = toggleTextTMP.rectTransform.sizeDelta with { y = toggleTextTMP.rectTransform.sizeDelta.y - 4};
         
         SetLabelText(labelText);
         SetOnText(onText);
