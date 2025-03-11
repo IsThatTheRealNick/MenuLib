@@ -1,5 +1,6 @@
 ﻿using System;
 using HarmonyLib;
+using MenuLib.MonoBehaviors;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -14,8 +15,7 @@ public sealed class REPOButton : REPOElement
     public Action onClick { get; private set; }
     
     internal MenuButton menuButton;
-
-    private MenuButtonPopUp menuButtonPopUp;
+    
     private TextMeshProUGUI buttonTextTMP;
     private Button button;
     
@@ -25,7 +25,7 @@ public sealed class REPOButton : REPOElement
         this.onClick = onClick;
     }
     
-    public void SetText(string newText)
+    public REPOButton SetText(string newText)
     {
         if (buttonTextTMP)
         {
@@ -34,9 +34,10 @@ public sealed class REPOButton : REPOElement
         }
         
         text = newText;
+        return this;
     }
 
-    public void SetOnClick(Action newOnClick)
+    public REPOButton SetOnClick(Action newOnClick)
     {
         if (button && newOnClick != null)
         {
@@ -45,18 +46,10 @@ public sealed class REPOButton : REPOElement
         }
         
         onClick = newOnClick;
+        return this;
     }
 
-    public void OpenDialog(string header, string content, Action onConfirm)
-    {
-        if (!menuButtonPopUp) 
-            menuButtonPopUp = transform.gameObject.AddComponent<MenuButtonPopUp>();   
-        
-        menuButtonPopUp.option1Event = new UnityEvent();
-        menuButtonPopUp.option1Event.AddListener(new UnityAction(onConfirm));
-
-        MenuManager.instance.PagePopUpTwoOptions(menuButtonPopUp, header, menuButtonPopUp.headerColor, content, "Yes", "No");
-    }
+    public TextMeshProUGUI GetButtonTMP() => buttonTextTMP;
     
     public override RectTransform GetReference() => MenuAPI.buttonTemplate;
     

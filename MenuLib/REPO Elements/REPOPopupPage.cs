@@ -23,7 +23,7 @@ public sealed class REPOPopupPage : REPOSimplePage
     
     public REPOPopupPage(string text, Action<REPOPopupPage> setup = null) : base(text, null) => setup?.Invoke(this);
 
-    public void SetLocalPosition(Vector2 newLocalPosition)
+    public new REPOPopupPage SetPosition(Vector2 newLocalPosition)
     {
         if (backgroundPanelTransform)
             backgroundPanelTransform.localPosition = newLocalPosition;
@@ -31,9 +31,10 @@ public sealed class REPOPopupPage : REPOSimplePage
         UpdateOtherElements();
         
         localPosition = newLocalPosition;
+        return this;
     }
     
-    public void SetSize(Vector2 newPanelSize)
+    public REPOPopupPage SetSize(Vector2 newPanelSize)
     {
         if (backgroundPanelTransform)
             backgroundPanelTransform.sizeDelta = newPanelSize;
@@ -41,9 +42,10 @@ public sealed class REPOPopupPage : REPOSimplePage
         UpdateOtherElements();
         
         panelSize = newPanelSize;
+        return this;
     }
 
-    public void SetBackgroundDimming(bool newBackgroundDimming)
+    public REPOPopupPage SetBackgroundDimming(bool newBackgroundDimming)
     {
         if (transform)
             switch (newBackgroundDimming)
@@ -58,24 +60,26 @@ public sealed class REPOPopupPage : REPOSimplePage
             }
 
         backgroundDimming = newBackgroundDimming;
+        return this;
     }
     
-    public void SetMaskPadding(Padding? padding)
+    public REPOPopupPage SetMaskPadding(Padding? padding)
     {
         maskPadding = padding;
         UpdateOtherElements();
+        return this;
     }
     
-    public void AddElementToScrollView(REPOElement repoElement, Vector2 newPosition)
+    public REPOPopupPage AddElementToScrollView(REPOElement repoElement, Vector2 newPosition)
     {
-        initializeButtons += () =>
-        {
+        initializeButtons += () => {
             var buttonTransform = repoElement.Instantiate();
             
             buttonTransform.SetParent(contentTransform);
             repoElement.SetPosition(newPosition);
             repoElement.afterBeingParented?.Invoke(menuPage);
         };
+        return this;
     }
 
     public void ClearButtons() => initializeButtons = null;
@@ -100,7 +104,7 @@ public sealed class REPOPopupPage : REPOSimplePage
         transform.name = $"Menu Page {text}";
         
         transform.SetParent(MenuHolder.instance.transform);
-        SetLocalPosition(localPosition);
+        SetPosition(localPosition);
 
         SetBackgroundDimming(backgroundDimming);
 

@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Reflection;
 using HarmonyLib;
+using MenuLib.MonoBehaviors;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -51,7 +52,13 @@ internal sealed class REPOMenuSliderFloat : MonoBehaviour
         
         descriptionTextTMP = transform.Find("Big Setting Text").GetComponent<TextMeshProUGUI>();
         
-        descriptionTextTMP.alignment = TextAlignmentOptions.Center;
+        descriptionTextTMP.alignment = TextAlignmentOptions.Left;
+        descriptionTextTMP.enableAutoSizing = descriptionTextTMP.enableWordWrapping = false;
+
+        var textScroller = descriptionTextTMP.gameObject.AddComponent<REPOTextScroller>();
+        textScroller.textMeshPro = descriptionTextTMP;
+        textScroller.maxCharacters = 35;
+        textScroller.StartAnimation();
         
         var descriptionSizeDelta = descriptionTextTMP.rectTransform.sizeDelta; 
         descriptionTextTMP.rectTransform.sizeDelta = descriptionSizeDelta with { y = descriptionSizeDelta.y - 4f };

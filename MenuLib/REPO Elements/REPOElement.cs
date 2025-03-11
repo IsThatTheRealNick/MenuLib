@@ -12,12 +12,13 @@ public abstract class REPOElement
     
     internal RectTransform transform;
     
-    public void SetPosition(Vector2 newLocalPosition)
+    public REPOElement SetPosition(Vector2 newLocalPosition)
     {
         if (transform)
             transform.localPosition = newLocalPosition;
         
         position = newLocalPosition;
+        return this;
     }
     
     public abstract RectTransform GetReference();
@@ -32,4 +33,8 @@ public abstract class REPOElement
         
         return transform;
     }
+
+    public T AddComponent<T>() where T : Component => transform.gameObject.AddComponent<T>();
+    
+    public T GetComponent<T>() where T : Component => transform.GetComponent<T>();
 }

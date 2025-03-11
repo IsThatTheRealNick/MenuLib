@@ -21,15 +21,16 @@ public class REPOSimplePage : REPOElement
         onSetup?.Invoke(this);
     }
 
-    public void SetText(string newText)
+    public REPOSimplePage SetText(string newText)
     {
         if (menuPage?.menuHeader)
             menuPage.menuHeader.text = newText;
         
         text = newText;
+        return this;
     }
     
-    public void AddElementToPage(REPOElement repoElement, Vector2 newPosition)
+    public REPOSimplePage AddElementToPage(REPOElement repoElement, Vector2 newPosition)
     {
         initializeButtons += () =>
         {
@@ -39,6 +40,8 @@ public class REPOSimplePage : REPOElement
             repoElement.SetPosition(newPosition);
             repoElement.afterBeingParented?.Invoke(menuPage);
         };
+        
+        return this;
     }
 
     public void OpenPage(bool addOnTop)

@@ -15,10 +15,6 @@
         <DebugType>none</DebugType>
     </PropertyGroup>
 
-    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-      <DebugType>embedded</DebugType>
-    </PropertyGroup>
-
     <ItemGroup>
       <Reference Include="0Harmony">
         <HintPath>$(GameBaseDir)\BepInEx\core\0Harmony.dll</HintPath>

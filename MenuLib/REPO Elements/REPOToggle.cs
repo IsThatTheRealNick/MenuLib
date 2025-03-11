@@ -30,31 +30,34 @@ public sealed class REPOToggle : REPOElement
         this.defaultValue = defaultValue;
     }
     
-    public void SetLabelText(string newLabelText)
+    public REPOToggle SetLabelText(string newLabelText)
     {
         if (toggleTextTMP)
             toggleTextTMP.text = newLabelText;
         
         labelText = newLabelText;
+        return this;
     }
     
-    public void SetOnText(string newOnText)
+    public REPOToggle SetOnText(string newOnText)
     {
         if (onTextTMP)
             onTextTMP.text = newOnText;
         
         onText = newOnText;
+        return this;
     }
     
-    public void SetOffText(string newOffText)
+    public REPOToggle SetOffText(string newOffText)
     {
         if (offTextTMP)
             offTextTMP.text = newOffText;
         
         offText = newOffText;
+        return this;
     }
 
-    public void SetOnClick(Action<bool> newOnClick)
+    public REPOToggle SetOnClick(Action<bool> newOnClick)
     {
         if (menuTwoOptions)
         {
@@ -66,6 +69,7 @@ public sealed class REPOToggle : REPOElement
         }
         
         onClick = newOnClick;
+        return this;
     }
     
     public override RectTransform GetReference() => MenuAPI.toggleTemplate;
