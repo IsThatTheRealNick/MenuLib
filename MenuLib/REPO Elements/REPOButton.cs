@@ -47,8 +47,6 @@ public sealed class REPOButton : REPOElement
         onClick = newOnClick;
         return this;
     }
-
-    public TextMeshProUGUI GetButtonTMP() => buttonTextTMP;
     
     public override RectTransform GetReference() => MenuAPI.buttonTemplate;
     

@@ -33,8 +33,4 @@ public abstract class REPOElement
         
         return transform;
     }
-
-    public T AddComponent<T>() where T : Component => transform.gameObject.AddComponent<T>();
-    
-    public T GetComponent<T>() where T : Component => transform.GetComponent<T>();
 }

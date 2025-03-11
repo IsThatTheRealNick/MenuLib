@@ -31,6 +31,8 @@ public sealed class REPOTextScroller : MonoBehaviour
                 yield return new WaitForSecondsRealtime(initialWaitTime);
                 isInitialRun = false;
             }
+            else
+                yield return new WaitForSecondsRealtime(scrollingCharacterPerSecond);
             
             while (textMeshPro.maxVisibleCharacters < characterCount)
             {
