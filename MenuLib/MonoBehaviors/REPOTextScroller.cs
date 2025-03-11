@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MenuLib.MonoBehaviors;
 
@@ -9,24 +10,29 @@ public sealed class REPOTextScroller : MonoBehaviour
     public TMP_Text textMeshPro;
     public int maxCharacters;
     
-    public float initialWaitTime = 3;
+    public float initialWaitTime = 5;
+    public float startWaitTime = 3;
     public float scrollingSpeedInSecondsPerCharacter = .5f;
     public float endWaitTime = 3;
+
+    private bool isInitial = true;
     
-    internal void StartAnimation() => StartCoroutine(Animate());
-    
-    private IEnumerator Animate()
+    public IEnumerator Animate()
     {
         while (true)
         {
             textMeshPro.firstVisibleCharacter = 0;
             textMeshPro.maxVisibleCharacters = maxCharacters;
-            
-            var characterCount = textMeshPro.text.Length;
 
-            yield return new WaitForSeconds(initialWaitTime);
+            if (isInitial)
+            {
+                yield return new WaitForSeconds(initialWaitTime);
+                isInitial = false;
+            }
+            else
+                yield return new WaitForSeconds(startWaitTime);
             
-            while (textMeshPro.maxVisibleCharacters < characterCount)
+            while (textMeshPro.maxVisibleCharacters < textMeshPro.text.Length)
             {
                 textMeshPro.firstVisibleCharacter++;
                 textMeshPro.maxVisibleCharacters++;

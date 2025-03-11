@@ -58,12 +58,13 @@ internal sealed class REPOMenuSliderFloat : MonoBehaviour
 
         var textScroller = descriptionTextTMP.gameObject.AddComponent<REPOTextScroller>();
         textScroller.textMeshPro = descriptionTextTMP;
-        textScroller.maxCharacters = 43;
-        textScroller.scrollingSpeedInSecondsPerCharacter = .1f;
-        textScroller.StartAnimation();
+        descriptionTextTMP.maxVisibleCharacters = textScroller.maxCharacters = 43;
+        textScroller.scrollingSpeedInSecondsPerCharacter = .25f;
+        textScroller.startWaitTime = 3;
+        textScroller.StartCoroutine(textScroller.Animate());
         
         var descriptionSizeDelta = descriptionTextTMP.rectTransform.sizeDelta; 
-        descriptionTextTMP.rectTransform.sizeDelta = descriptionSizeDelta with { x = descriptionSizeDelta.x - 20f, y = descriptionSizeDelta.y - 4f };
+        descriptionTextTMP.rectTransform.sizeDelta = descriptionSizeDelta with { y = descriptionSizeDelta.y - 4f };
         
         barSizeRectTransform = (RectTransform) transform.Find("BarSize");
 
@@ -134,7 +135,7 @@ internal sealed class REPOMenuSliderFloat : MonoBehaviour
                 MenuManager.instance.MenuEffectHover(SemiFunc.MenuGetPitchFromYPos(rectTransform));
                 isHovering = true;
             }
-            
+                
             SemiFunc.MenuSelectionBoxTargetSet(menuPage, barSizeRectTransform, new Vector2(-3f, 0f), new Vector2(20f, 10f));
             
             OnHover();
