@@ -10,10 +10,8 @@ public sealed class REPOTextScroller : MonoBehaviour
     public int maxCharacters;
     
     public float initialWaitTime = 3;
-    public float scrollingCharacterPerSecond = .5f;
+    public float scrollingSpeedInSecondsPerCharacter = .5f;
     public float endWaitTime = 3;
-
-    private bool isInitialRun;
     
     internal void StartAnimation() => StartCoroutine(Animate());
     
@@ -26,22 +24,16 @@ public sealed class REPOTextScroller : MonoBehaviour
             
             var characterCount = textMeshPro.text.Length;
 
-            if (isInitialRun)
-            {
-                yield return new WaitForSecondsRealtime(initialWaitTime);
-                isInitialRun = false;
-            }
-            else
-                yield return new WaitForSecondsRealtime(scrollingCharacterPerSecond);
+            yield return new WaitForSeconds(initialWaitTime);
             
             while (textMeshPro.maxVisibleCharacters < characterCount)
             {
                 textMeshPro.firstVisibleCharacter++;
                 textMeshPro.maxVisibleCharacters++;
-                yield return new WaitForSecondsRealtime(scrollingCharacterPerSecond);
+                yield return new WaitForSeconds(scrollingSpeedInSecondsPerCharacter);
             }
             
-            yield return new WaitForSecondsRealtime(endWaitTime);
+            yield return new WaitForSeconds(endWaitTime);
         }
     }
 }

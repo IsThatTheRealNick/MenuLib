@@ -53,14 +53,17 @@ internal sealed class REPOMenuSliderFloat : MonoBehaviour
         
         descriptionTextTMP.alignment = TextAlignmentOptions.Left;
         descriptionTextTMP.enableAutoSizing = descriptionTextTMP.enableWordWrapping = false;
+        descriptionTextTMP.overflowMode = TextOverflowModes.Masking;
+        descriptionTextTMP.fontSize -= 5;
 
         var textScroller = descriptionTextTMP.gameObject.AddComponent<REPOTextScroller>();
         textScroller.textMeshPro = descriptionTextTMP;
-        textScroller.maxCharacters = 35;
+        textScroller.maxCharacters = 43;
+        textScroller.scrollingSpeedInSecondsPerCharacter = .1f;
         textScroller.StartAnimation();
         
         var descriptionSizeDelta = descriptionTextTMP.rectTransform.sizeDelta; 
-        descriptionTextTMP.rectTransform.sizeDelta = descriptionSizeDelta with { y = descriptionSizeDelta.y - 4f };
+        descriptionTextTMP.rectTransform.sizeDelta = descriptionSizeDelta with { x = descriptionSizeDelta.x - 20f, y = descriptionSizeDelta.y - 4f };
         
         barSizeRectTransform = (RectTransform) transform.Find("BarSize");
 
