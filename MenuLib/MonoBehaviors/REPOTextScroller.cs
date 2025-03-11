@@ -2,7 +2,7 @@
 using TMPro;
 using UnityEngine;
 
-namespace MenuLib;
+namespace MenuLib.MonoBehaviors;
 
 public sealed class REPOTextScroller : MonoBehaviour
 {

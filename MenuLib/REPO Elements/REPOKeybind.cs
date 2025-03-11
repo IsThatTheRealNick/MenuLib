@@ -1,6 +1,6 @@
 ﻿using System;
 using HarmonyLib;
-using REPOConfig.MonoBehaviors;
+using MenuLib.MonoBehaviors;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;

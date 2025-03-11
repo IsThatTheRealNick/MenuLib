@@ -6,7 +6,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace MenuLib;
+namespace MenuLib.MonoBehaviors;
 
 internal sealed class REPOMenuSliderFloat : MonoBehaviour
 {

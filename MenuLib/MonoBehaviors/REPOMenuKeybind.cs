@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
-namespace REPOConfig.MonoBehaviors;
+namespace MenuLib.MonoBehaviors;
 
 internal sealed class REPOMenuKeybind : MonoBehaviour
 {
