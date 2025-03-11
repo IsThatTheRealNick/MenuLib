@@ -14,6 +14,13 @@ public sealed class REPOSlider : REPOElement
     public float max { get; private set; }
     public int precision { get; private set; }
 
+    public bool scrollIsEnabled { get; private set; }
+    public int scrollMaxVisibleCharacter {get; private set; }
+    public float scrollSpeedInSecondsPerCharacter {get; private set; }
+    public float scrollInitialWaitTime {get; private set; }
+    public float scrollStartWaitTime {get; private set; }
+    public float scrollEndWaitTime {get; private set; }
+    
     public string[] options { get; private set; }
     
     public Action<float> onValueChanged { get; private set; }
@@ -97,6 +104,44 @@ public sealed class REPOSlider : REPOElement
         precision = newPrecision;
         return this;
     }
+
+    public REPOSlider SetScrollSettings(int newScrollMaxVisibleCharacter, float newScrollSpeedInSecondsPerCharacter, float newScrollInitialWaitTime, float newScrollStartWaitTime, float newScrollEndWaitTime)
+    {
+        if (menuSliderFloat.textScroller && menuSliderFloat.descriptionTextTMP)
+        {
+            var textScroller = menuSliderFloat.textScroller;
+            
+            menuSliderFloat.descriptionTextTMP.maxVisibleCharacters = textScroller.maxCharacters = newScrollMaxVisibleCharacter;
+            textScroller.scrollingSpeedInSecondsPerCharacter = newScrollSpeedInSecondsPerCharacter;
+            
+            textScroller.initialWaitTime = newScrollInitialWaitTime;
+            textScroller.startWaitTime = newScrollStartWaitTime;
+            textScroller.endWaitTime = newScrollEndWaitTime;
+        }
+
+        scrollMaxVisibleCharacter = newScrollMaxVisibleCharacter;
+        scrollSpeedInSecondsPerCharacter = newScrollSpeedInSecondsPerCharacter;
+        scrollInitialWaitTime = newScrollInitialWaitTime;
+        scrollStartWaitTime = newScrollStartWaitTime;
+        scrollEndWaitTime = newScrollEndWaitTime;
+        return this;
+    }
+
+    public REPOSlider ToggleScroll(bool state)
+    {
+        if (menuSliderFloat?.textScroller)
+        {
+            var textScroller = menuSliderFloat.textScroller;
+        
+            textScroller.StopAllCoroutines();
+        
+            if (state)
+                textScroller.StartCoroutine(textScroller.Animate());   
+        }
+
+        scrollIsEnabled = state;
+        return this;
+    }
     
     public REPOSlider SetOnValueChanged(Action<float> newOnValueChanged)
     {
@@ -146,6 +191,8 @@ public sealed class REPOSlider : REPOElement
         menuSliderFloat.Initialize(defaultValue);
         SetText(text);
         SetDescription(description);
+        SetScrollSettings(scrollMaxVisibleCharacter, scrollSpeedInSecondsPerCharacter, scrollInitialWaitTime, scrollStartWaitTime, scrollEndWaitTime);
+        ToggleScroll(scrollIsEnabled);
         
         afterBeingParented = menuPage =>
         {

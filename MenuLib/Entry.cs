@@ -1,5 +1,6 @@
 ﻿using System;
 using BepInEx;
+using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
 using Mono.Cecil.Cil;
@@ -13,8 +14,9 @@ namespace MenuLib
     internal sealed class Entry : BaseUnityPlugin
     {
         private const string MOD_NAME = "Menu Lib";
-
+        
         internal static readonly ManualLogSource logger = BepInEx.Logging.Logger.CreateLogSource(MOD_NAME);
+        
 
         private static void MenuManager_StartHook(Action<MenuManager> orig, MenuManager self)
         {

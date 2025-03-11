@@ -13,6 +13,8 @@ internal sealed class REPOMenuSliderFloat : MonoBehaviour
     private static readonly FieldInfo getMenuID = AccessTools.Field(typeof(MenuSelectableElement), "menuID");
     
     internal MenuPage menuPage;
+    internal REPOTextScroller textScroller;
+    internal TextMeshProUGUI descriptionTextTMP;
     
     internal Action<float> onValueChanged;
     internal Action<int> onOptionChanged;
@@ -23,7 +25,7 @@ internal sealed class REPOMenuSliderFloat : MonoBehaviour
     internal float min, max, precision;
     internal int decimalPlaces;
     
-    private TextMeshProUGUI headerTMP, barTMP, maskedTMP, descriptionTextTMP;
+    private TextMeshProUGUI headerTMP, barTMP, maskedTMP;
     private MenuSelectableElement menuSelectableElement;
     private RectTransform rectTransform, maskedRectTransform, barRectTransform, barSizeRectTransform;
     private RectTransform bigTextOutline, bigTextFill;
@@ -56,12 +58,8 @@ internal sealed class REPOMenuSliderFloat : MonoBehaviour
         descriptionTextTMP.overflowMode = TextOverflowModes.Masking;
         descriptionTextTMP.fontSize -= 5;
 
-        var textScroller = descriptionTextTMP.gameObject.AddComponent<REPOTextScroller>();
+        textScroller = descriptionTextTMP.gameObject.AddComponent<REPOTextScroller>();
         textScroller.textMeshPro = descriptionTextTMP;
-        descriptionTextTMP.maxVisibleCharacters = textScroller.maxCharacters = 43;
-        textScroller.scrollingSpeedInSecondsPerCharacter = .25f;
-        textScroller.startWaitTime = 3;
-        textScroller.StartCoroutine(textScroller.Animate());
         
         var descriptionSizeDelta = descriptionTextTMP.rectTransform.sizeDelta; 
         descriptionTextTMP.rectTransform.sizeDelta = descriptionSizeDelta with { y = descriptionSizeDelta.y - 4f };
