@@ -107,10 +107,8 @@ public sealed class REPOSlider : REPOElement
 
     public REPOSlider SetScrollSettings(int newScrollMaxVisibleCharacter, float newScrollSpeedInSecondsPerCharacter, float newScrollInitialWaitTime, float newScrollStartWaitTime, float newScrollEndWaitTime)
     {
-        if (menuSliderFloat.textScroller && menuSliderFloat.descriptionTextTMP)
+        if (menuSliderFloat?.textScroller is { } textScroller)
         {
-            var textScroller = menuSliderFloat.textScroller;
-            
             menuSliderFloat.descriptionTextTMP.maxVisibleCharacters = textScroller.maxCharacters = newScrollMaxVisibleCharacter;
             textScroller.scrollingSpeedInSecondsPerCharacter = newScrollSpeedInSecondsPerCharacter;
             
