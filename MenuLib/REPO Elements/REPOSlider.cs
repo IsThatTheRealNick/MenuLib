@@ -1,6 +1,7 @@
 ﻿using System;
 using HarmonyLib;
 using MenuLib.MonoBehaviors;
+using TMPro;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -15,7 +16,7 @@ public sealed class REPOSlider : REPOElement
     public int precision { get; private set; }
 
     public bool scrollIsEnabled { get; private set; }
-    public int scrollMaxVisibleCharacter {get; private set; }
+    public int scrollMaxVisibleCharacter { get; private set; } = 99999;
     public float scrollSpeedInSecondsPerCharacter {get; private set; }
     public float scrollInitialWaitTime {get; private set; }
     public float scrollStartWaitTime {get; private set; }
@@ -132,9 +133,13 @@ public sealed class REPOSlider : REPOElement
             var textScroller = menuSliderFloat.textScroller;
         
             textScroller.StopAllCoroutines();
-        
+
             if (state)
-                textScroller.StartCoroutine(textScroller.Animate());   
+            {
+                menuSliderFloat.descriptionTextTMP.alignment = TextAlignmentOptions.Left;
+                textScroller.StartCoroutine(textScroller.Animate());
+            } else
+                menuSliderFloat.descriptionTextTMP.alignment = TextAlignmentOptions.Center;
         }
 
         scrollIsEnabled = state;
