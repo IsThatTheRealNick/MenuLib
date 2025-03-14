@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 using HarmonyLib;
 using TMPro;
 using UnityEngine;
@@ -25,18 +26,40 @@ internal sealed class REPOMenuKeybind : MonoBehaviour
     
     private static Key ParseKeyName(string keyName)
     {
-        if (Enum.TryParse<Key>(keyName.Replace(" ", string.Empty), out var key))
-            return key;
-
-        return keyName switch
+        Debug.Log(keyName);
+        
+        var key = keyName switch
         {
             "-" => Key.Minus,
             "+" => Key.NumpadPlus,
             "," => Key.Comma,
             "." => Key.Period,
             "=" => Key.Equals,
+            "`" => Key.Backquote,
+            "0" => Key.Digit0,
+            "1" => Key.Digit1,
+            "2" => Key.Digit2,
+            "3" => Key.Digit3,
+            "4" => Key.Digit4,
+            "5" => Key.Digit5,
+            "6" => Key.Digit6,
+            "7" => Key.Digit7,
+            "8" => Key.Digit8,
+            "9" => Key.Digit9,
+            "/" => Key.Slash,
+            "\\" => Key.Backslash,
+            "Right Alt" => Key.RightAlt,
+            "Left Control" => Key.LeftCtrl,
+            "Right Control" => Key.RightCtrl,
+            "Left System" => Key.LeftWindows,
+            "Right System" => Key.RightWindows,
             _ => Key.None
         };
+
+        if (key != Key.None)
+            return key;
+
+        return Enum.TryParse(keyName.Replace(" ", string.Empty), out key) ? key : Key.None;
     }
     
     internal void Initialize(Key startingValue)
@@ -55,8 +78,16 @@ internal sealed class REPOMenuKeybind : MonoBehaviour
     }
     
     internal void SetHeader(string label) => headerTMP.text = label;
-    
-    internal void UpdateKeybindLabel() => buttonTMP.text = menuBigButton.buttonName = currentKey.ToString();
+
+    internal void UpdateKeybindLabel()
+    {
+        var sanitizedName = currentKey.ToString();
+
+        sanitizedName = sanitizedName.Replace("Digit", string.Empty).Replace("Numpad", string.Empty).Replace("Slash", "/").Replace("Backslash", "\\");
+        sanitizedName = Regex.Replace(sanitizedName, "([a-z])([A-Z])", "$1 $2");
+        
+        buttonTMP.text = menuBigButton.buttonName = sanitizedName;
+    }
 
     private void Update()
     {

@@ -10,13 +10,12 @@ using UnityEngine;
 
 namespace MenuLib
 {
-    [BepInPlugin("nickklmao.menulib", MOD_NAME, "1.0.2")]
+    [BepInPlugin("nickklmao.menulib", MOD_NAME, "1.0.3")]
     internal sealed class Entry : BaseUnityPlugin
     {
         private const string MOD_NAME = "Menu Lib";
         
         internal static readonly ManualLogSource logger = BepInEx.Logging.Logger.CreateLogSource(MOD_NAME);
-        
 
         private static void MenuManager_StartHook(Action<MenuManager> orig, MenuManager self)
         {
