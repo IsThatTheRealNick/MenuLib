@@ -38,7 +38,7 @@ internal sealed class REPOMenuSliderFloat : MonoBehaviour
 
     private bool isHovering;
 
-    private bool hasValueChanged => Mathf.Abs(currentValue - previousValue) >= 0.01;
+    private bool hasValueChanged => Mathf.Abs(currentValue - previousValue) >= Mathf.Epsilon;
     
     internal void Initialize(float defaultValue)
     {
@@ -201,7 +201,7 @@ internal sealed class REPOMenuSliderFloat : MonoBehaviour
 
     private void Increment()
     {
-        var increment = options != null ? 1 : precision * 2f;
+        var increment = options != null ? 1 : precision;
         
         var newValue = currentValue + increment;
         
@@ -215,7 +215,7 @@ internal sealed class REPOMenuSliderFloat : MonoBehaviour
     
     private void Decrement()
     {
-        var increment = options != null ? 1 : precision * 2f;
+        var increment = options != null ? 1 : precision;
         
         var newValue = currentValue - increment;
             
@@ -236,7 +236,7 @@ internal sealed class REPOMenuSliderFloat : MonoBehaviour
         }
         
         var valueAsString = currentValue.ToString(CultureInfo.InvariantCulture);
-
+        
         valueAsString = int.TryParse(valueAsString, out var value) ? value.ToString() : currentValue.ToString($"F{decimalPlaces}", CultureInfo.InvariantCulture);
         
         barTMP.text = maskedTMP.text = (displayPrefix ??= string.Empty) + valueAsString + (displayPostfix ??= string.Empty);

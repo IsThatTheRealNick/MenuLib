@@ -1,6 +1,5 @@
 ﻿using System;
 using BepInEx;
-using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
 using Mono.Cecil.Cil;
@@ -10,7 +9,7 @@ using UnityEngine;
 
 namespace MenuLib
 {
-    [BepInPlugin("nickklmao.menulib", MOD_NAME, "1.0.3")]
+    [BepInPlugin("nickklmao.menulib", MOD_NAME, "1.0.4")]
     internal sealed class Entry : BaseUnityPlugin
     {
         private const string MOD_NAME = "Menu Lib";
