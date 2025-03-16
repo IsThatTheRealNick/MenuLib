@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Reflection;
 using HarmonyLib;
+using MenuLib.Enums;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -15,6 +16,8 @@ internal sealed class REPOMenuSliderFloat : MonoBehaviour
     internal MenuPage menuPage;
     internal REPOTextScroller textScroller;
     internal TextMeshProUGUI descriptionTextTMP;
+
+    internal REPOBarState barState;
     
     internal Action<float> onValueChanged;
     internal Action<int> onOptionChanged;
@@ -101,7 +104,7 @@ internal sealed class REPOMenuSliderFloat : MonoBehaviour
             decimalPlaces = 0;
         else
             decimalPlaces = precisionAsString.Length - decimalIndex - 1;
-        
+
         UpdateBarPosition();
         UpdateBarLabel();
     }
@@ -122,6 +125,12 @@ internal sealed class REPOMenuSliderFloat : MonoBehaviour
         }
         
         descriptionTextTMP.text = text;
+    }
+
+    internal void UpdateBarState(REPOBarState newBarState)
+    {
+        barState = newBarState;
+        UpdateBarPosition();
     }
 
     private void Update()
@@ -191,7 +200,21 @@ internal sealed class REPOMenuSliderFloat : MonoBehaviour
             MenuManager.instance.MenuEffectClick(MenuManager.MenuClickEffectType.Tick, menuPage);
     }
 
-    private void UpdateBarPosition() => SetBarPosition((currentValue - min) / (max - min));
+    private void UpdateBarPosition()
+    {
+        switch (barState)
+        {
+            case REPOBarState.UpdateWithValue:
+                SetBarPosition((currentValue - min) / (max - min));
+                break;
+            case REPOBarState.StaticAtMinimum:
+                SetBarPosition(0);
+                break;
+            case REPOBarState.StaticAtMaximum:
+                SetBarPosition(1);
+                break;
+        }
+    }
     
     private void SetBarPosition(float normalizedValue)
     {

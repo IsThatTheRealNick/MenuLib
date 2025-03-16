@@ -1,5 +1,6 @@
 ﻿using System;
 using HarmonyLib;
+using MenuLib.Enums;
 using MenuLib.MonoBehaviors;
 using TMPro;
 using UnityEngine;
@@ -14,6 +15,8 @@ public sealed class REPOSlider : REPOElement
     public float min { get; private set; }
     public float max { get; private set; }
     public int precision { get; private set; }
+
+    public REPOBarState barState { get; private set; }
 
     public bool scrollIsEnabled { get; private set; }
     public int scrollMaxVisibleCharacter { get; private set; } = 99999;
@@ -106,6 +109,14 @@ public sealed class REPOSlider : REPOElement
         return this;
     }
 
+    public REPOSlider SetBarState(REPOBarState newBarState)
+    {
+        menuSliderFloat?.UpdateBarState(newBarState);
+
+        barState = newBarState;
+        return this;
+    }
+
     public REPOSlider SetScrollSettings(int newScrollMaxVisibleCharacter, float newScrollSpeedInSecondsPerCharacter, float newScrollInitialWaitTime, float newScrollStartWaitTime, float newScrollEndWaitTime)
     {
         if (menuSliderFloat?.textScroller is { } textScroller)
@@ -125,8 +136,11 @@ public sealed class REPOSlider : REPOElement
         scrollEndWaitTime = newScrollEndWaitTime;
         return this;
     }
-
-    public REPOSlider ToggleScroll(bool state)
+    
+    [Obsolete("This will be removed in the future, use SetScroll instead.")]
+    public REPOSlider ToggleScroll(bool state) => SetScroll(state);
+    
+    public REPOSlider SetScroll(bool state)
     {
         if (menuSliderFloat?.textScroller)
         {
@@ -195,7 +209,8 @@ public sealed class REPOSlider : REPOElement
         SetText(text);
         SetDescription(description);
         SetScrollSettings(scrollMaxVisibleCharacter, scrollSpeedInSecondsPerCharacter, scrollInitialWaitTime, scrollStartWaitTime, scrollEndWaitTime);
-        ToggleScroll(scrollIsEnabled);
+        SetScroll(scrollIsEnabled);
+        SetBarState(barState);
         
         afterBeingParented = menuPage =>
         {
