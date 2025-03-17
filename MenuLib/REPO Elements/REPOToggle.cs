@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections;
 using HarmonyLib;
-using TMPro;
+using MenuLib.MonoBehaviors;
 using UnityEngine;
-using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
 namespace MenuLib;
@@ -11,62 +9,51 @@ namespace MenuLib;
 public sealed class REPOToggle : REPOElement
 {
     public string labelText { get; private set; }
-    public string onText { get; private set; }
-    public string offText { get; private set; }
+    public string rightButtonText { get; private set; }
+    public string leftButtonText { get; private set; }
     
     public Action<bool> onClick { get; private set; }
-    
-    private MenuTwoOptions menuTwoOptions;
-    private TextMeshProUGUI toggleTextTMP, onTextTMP, offTextTMP;
+
+    private REPOMenuToggle menuToggle;
     
     private readonly bool defaultValue;
     
-    public REPOToggle(string labelText, Action<bool> onClick, string onText, string offText, bool defaultValue)
+    public REPOToggle(string labelText, Action<bool> onClick, string rightButtonText, string leftButtonText, bool defaultValue)
     {
         this.labelText = labelText;
         this.onClick = onClick;
-        this.onText = onText;
-        this.offText = offText;
+        this.rightButtonText = rightButtonText;
+        this.leftButtonText = leftButtonText;
         this.defaultValue = defaultValue;
     }
     
     public REPOToggle SetLabelText(string newLabelText)
-    {
-        if (toggleTextTMP)
-            toggleTextTMP.text = newLabelText;
+    { 
+        menuToggle?.SetLabel(newLabelText);
         
         labelText = newLabelText;
         return this;
     }
     
-    public REPOToggle SetOnText(string newOnText)
+    public REPOToggle SetLeftButtonText(string newLeftButtonText)
     {
-        if (onTextTMP)
-            onTextTMP.text = newOnText;
-        
-        onText = newOnText;
+        menuToggle?.SetLeftButtonText(newLeftButtonText);
+        rightButtonText = newLeftButtonText;
         return this;
     }
     
-    public REPOToggle SetOffText(string newOffText)
+    public REPOToggle SetRightButtonText(string newRightButtonText)
     {
-        if (offTextTMP)
-            offTextTMP.text = newOffText;
+        menuToggle?.SetRightButtonText(newRightButtonText);
         
-        offText = newOffText;
+        leftButtonText = newRightButtonText;
         return this;
     }
 
     public REPOToggle SetOnClick(Action<bool> newOnClick)
     {
-        if (menuTwoOptions)
-        {
-            menuTwoOptions.onOption1 = new Button.ButtonClickedEvent();
-            menuTwoOptions.onOption1.AddListener(() => newOnClick?.Invoke(true));
-            
-            menuTwoOptions.onOption2 = new Button.ButtonClickedEvent();
-            menuTwoOptions.onOption2.AddListener(() => newOnClick?.Invoke(false));
-        }
+        if (menuToggle)
+            menuToggle.onValueChanged = newOnClick;
         
         onClick = newOnClick;
         return this;
@@ -76,46 +63,25 @@ public sealed class REPOToggle : REPOElement
     
     public override void SetDefaults()
     {
-        menuTwoOptions = transform.GetComponent<MenuTwoOptions>();
-        toggleTextTMP = transform.GetComponentInChildren<TextMeshProUGUI>();
-        onTextTMP = menuTwoOptions.option1TextMesh;
-        offTextTMP = menuTwoOptions.option2TextMesh;
+        Object.Destroy(transform.GetComponent<MenuTwoOptions>());
+        Object.Destroy(transform.GetComponent<AudioButtonPushToTalk>());
+
+        menuToggle = transform.gameObject.AddComponent<REPOMenuToggle>();
         
         transform.name = $"Toggle Button - {labelText}";
         
-        menuTwoOptions.customEvents = true;
-        menuTwoOptions.settingSet = false;
-
-        toggleTextTMP.rectTransform.sizeDelta = toggleTextTMP.rectTransform.sizeDelta with { y = toggleTextTMP.rectTransform.sizeDelta.y - 4};
+        menuToggle.Initialize(defaultValue);
         
         SetLabelText(labelText);
-        SetOnText(onText);
-        SetOffText(offText);
-
-        Object.Destroy(transform.GetComponent<AudioButtonPushToTalk>());
+        SetLeftButtonText(rightButtonText);
+        SetRightButtonText(leftButtonText);
+        SetOnClick(onClick);
         
-        menuTwoOptions.StartCoroutine(SetupLate());
-
-        afterBeingParented = menuPage =>
-        {
+        afterBeingParented = menuPage => {
             var menuButtons = transform.GetComponentsInChildren<MenuButton>();
 
             foreach (var menuButton in menuButtons)
                 AccessTools.Field(typeof(MenuButton), "parentPage").SetValue(menuButton, menuPage);
         };
-        
-        return;
-        
-        IEnumerator SetupLate()
-        {
-            yield return null;
-            
-            if (defaultValue)
-                menuTwoOptions.OnOption1();
-            else
-                menuTwoOptions.OnOption2();
-            
-            SetOnClick(onClick);
-        }
     }
 }

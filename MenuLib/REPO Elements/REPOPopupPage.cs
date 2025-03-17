@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections;
 using HarmonyLib;
+using MenuLib.MonoBehaviors;
 using UnityEngine;
-using UnityEngine.Events;
 using Object = UnityEngine.Object;
 
 namespace MenuLib;
@@ -20,6 +20,8 @@ public sealed class REPOPopupPage : REPOSimplePage
     private Transform pageDimmerTransform, contentTransform;
     
     private MenuScrollBox menuScrollBox;
+
+    private REPOScrollBoxVisibilityManager scrollBoxVisibilityManager;
     
     public REPOPopupPage(string text, Action<REPOPopupPage> setup = null) : base(text, null) => setup?.Invoke(this);
 
@@ -100,7 +102,13 @@ public sealed class REPOPopupPage : REPOSimplePage
         scrollBarOutlineTransform = (RectTransform)  scrollBarTransform.Find("Scroll Bar Bg (1)");
         scrollBarFillTransform = (RectTransform)  scrollBarTransform.Find("Scroll Bar Bg (2)");
         scrollBarBackgroundTransform = (RectTransform)  scrollBarTransform.Find("Scroll Bar Bg");
+        menuScrollBox = scrollBoxTransform.GetComponent<MenuScrollBox>();
+        contentTransform = maskTransform.Find("Scroller");
 
+        scrollBoxVisibilityManager = transform.gameObject.AddComponent<REPOScrollBoxVisibilityManager>();
+        scrollBoxVisibilityManager.scroller = contentTransform as RectTransform;
+        scrollBoxVisibilityManager.mask = maskTransform;
+        
         transform.name = $"Menu Page {text}";
         
         transform.SetParent(MenuHolder.instance.transform);
@@ -115,8 +123,6 @@ public sealed class REPOPopupPage : REPOSimplePage
         backgroundPanelTransform.anchorMax = backgroundPanelTransform.anchorMin = new Vector2(.5f, .5f);
         SetSize(panelSize);
         
-        contentTransform = maskTransform.Find("Scroller");
-        
         for (var i = contentTransform.childCount - 1; i >= 0; i--)
         {
             var child = contentTransform.GetChild(i);
@@ -125,27 +131,66 @@ public sealed class REPOPopupPage : REPOSimplePage
                 continue;
             
             Object.Destroy(child.gameObject);
-        }    
+        }
         
         initializeButtons?.Invoke();
         
-        menuScrollBox = scrollBoxTransform.GetComponent<MenuScrollBox>();
-        menuScrollBox.heightPadding = 50;
-        
-        menuScrollBox.StartCoroutine(ResetScrollBox(menuScrollBox));
+        menuScrollBox.StartCoroutine(ResetScrollBox());
         
         transform.gameObject.AddComponent<MenuPageSettings>();
         
         return;
 
-        IEnumerator ResetScrollBox(MenuScrollBox menuScrollBoxInstance)
+        IEnumerator ResetScrollBox()
         {
             yield return null;
-            var scrollHandlePosition = scrollBarBackgroundTransform.sizeDelta.y - menuScrollBoxInstance.scrollHandle.sizeDelta.y * .5f;
-            menuScrollBoxInstance.scrollHandle.localPosition = menuScrollBoxInstance.scrollHandle.localPosition with { y = scrollHandlePosition }; 
-            AccessTools.Field(typeof(MenuScrollBox), "scrollHandleTargetPosition").SetValue(menuScrollBoxInstance, scrollHandlePosition);
             
-            AccessTools.Method(typeof(MenuScrollBox), "Start").Invoke(menuScrollBoxInstance, null);
+            /*AccessTools.Field(typeof(MenuScrollBox), "parentPage").SetValue(menuScrollBox, menuPage);
+            AccessTools.Field(typeof(MenuScrollBox), "scrollHandleTargetPosition").SetValue(menuScrollBox, scrollHandlePosition);*/
+            
+            var scrollHandlePosition = scrollBarBackgroundTransform.sizeDelta.y - menuScrollBox.scrollHandle.sizeDelta.y * .5f;
+            menuScrollBox.scrollHandle.localPosition = menuScrollBox.scrollHandle.localPosition with { y = scrollHandlePosition }; 
+            AccessTools.Field(typeof(MenuScrollBox), "scrollHandleTargetPosition").SetValue(menuScrollBox, scrollHandlePosition);
+            
+            
+            var minY = float.MaxValue;
+            var maxY = float.MinValue;
+
+            for (var i = 0; i < contentTransform.childCount; i++)
+            {
+                if (i <= 2)
+                    continue;
+                
+                var child = contentTransform.GetChild(i) as RectTransform;
+                
+                var corners = new Vector3[4];
+                child!.GetWorldCorners(corners);
+                
+                for (var j = 0; j < 4; j++)
+                    corners[j] = contentTransform.InverseTransformPoint(corners[j]);
+                
+                var childMinY = Mathf.Min(corners[0].y, corners[1].y, corners[2].y, corners[3].y);
+                var childMaxY = Mathf.Max(corners[0].y, corners[1].y, corners[2].y, corners[3].y);
+        
+                minY = Mathf.Min(minY, childMinY);
+                maxY = Mathf.Max(maxY, childMaxY);
+            }
+
+            var height = Math.Abs(maxY - minY);
+            
+            AccessTools.Field(typeof(MenuScrollBox), "scrollHeight").SetValue(menuScrollBox, height);
+            AccessTools.Field(typeof(MenuScrollBox), "scrollerStartPosition").SetValue(menuScrollBox, height + 42f);
+            AccessTools.Field(typeof(MenuScrollBox), "scrollerEndPosition").SetValue(menuScrollBox, contentTransform.localPosition.y);
+
+            if (height < maskTransform.sizeDelta.y)
+                menuScrollBox.scrollBar.SetActive(false);
+            else
+            {
+                menuScrollBox.scrollBar.SetActive(true);
+                
+                var scrollBoxesFieldInfo = AccessTools.Field(typeof(MenuPage), "scrollBoxes"); 
+                scrollBoxesFieldInfo.SetValue(menuPage, (int) scrollBoxesFieldInfo.GetValue(menuPage) + 1);
+            }
         }
     }
 
