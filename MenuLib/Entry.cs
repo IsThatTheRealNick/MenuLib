@@ -127,8 +127,10 @@ namespace MenuLib
             logger.LogDebug("Hooking `SemiFunc.UIMouseHover`");
             new ILHook(AccessTools.Method(typeof(SemiFunc), "UIMouseHover"), SemiFunc_UIMouseHoverILHook);
             
-            logger.LogDebug("Hooking `MenuScrollBox.Start`");
-            new ILHook(AccessTools.Method(typeof(MenuScrollBox), "Start"), MenuScrollBox_StartILHook);
+            
+            //Requires a rewrite
+            /*logger.LogDebug("Hooking `MenuScrollBox.Start`");
+            new ILHook(AccessTools.Method(typeof(MenuScrollBox), "Start"), MenuScrollBox_StartILHook);*/
         }
     }
 }
