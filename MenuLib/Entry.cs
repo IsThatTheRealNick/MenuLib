@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection;
 using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
@@ -41,7 +40,7 @@ namespace MenuLib
             cursor.Emit(OpCodes.Ldloc_0);
             cursor.EmitDelegate((MenuScrollBox menuScrollBox, Vector2 vector) =>
             {
-                var mask = (RectTransform) menuScrollBox.transform.Find("Mask");
+                var mask = (RectTransform) menuScrollBox.scroller.parent;
 
                 var bottom = mask.position.y;
                 var top = bottom + mask.sizeDelta.y;
@@ -126,7 +125,6 @@ namespace MenuLib
             
             logger.LogDebug("Hooking `SemiFunc.UIMouseHover`");
             new ILHook(AccessTools.Method(typeof(SemiFunc), "UIMouseHover"), SemiFunc_UIMouseHoverILHook);
-            
             
             //Requires a rewrite
             /*logger.LogDebug("Hooking `MenuScrollBox.Start`");
