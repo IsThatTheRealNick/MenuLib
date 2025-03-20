@@ -1,48 +1,26 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using MenuLib.MonoBehaviors;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UI;
+using Object = UnityEngine.Object;
 
 namespace MenuLib;
 
 public static class MenuAPI
 {
-    internal static RectTransform pageDimmer { get; private set; }
-    internal static RectTransform simplePageTemplate { get; private set; }
-    internal static RectTransform buttonTemplate { get; private set; }
-    internal static RectTransform popupPageTemplate { get; private set; }
-    internal static RectTransform toggleTemplate { get; private set; }
-    internal static RectTransform sliderTemplate { get; private set; }
-    internal static RectTransform keybindTemplate { get; private set; }
-    
-    internal static Action<MenuPageMain> addToMainMenuEvent;
-    internal static Action<MenuPageEsc> addToEscapeMenuEvent;
-
-    private static bool initialized;
+    internal static BuilderDelegate mainMenuBuilderDelegates;
+    internal static BuilderDelegate escapeMenuBuilderDelegates;
 
     private static MenuButtonPopUp menuButtonPopup;
-
-    public static void AddElementToMainMenu(REPOElement repoElement, Vector2 newPosition)
-    {
-        addToMainMenuEvent += instance =>
-        {
-            var transform = repoElement.Instantiate();
-            
-            transform.SetParent(instance.transform);
-            repoElement.SetPosition(newPosition);
-            repoElement.afterBeingParented?.Invoke(instance.GetComponent<MenuPage>());
-        };
-    }
-
-    public static void AddElementToEscapeMenu(REPOElement repoElement, Vector2 newPosition)
-    {
-        addToEscapeMenuEvent += instance => {
-            var transform = repoElement.Instantiate();
-            
-            transform.SetParent(instance.transform);
-            repoElement.SetPosition(newPosition);
-            repoElement.afterBeingParented?.Invoke(instance.GetComponent<MenuPage>());
-        };
-    }
+    
+    public delegate void BuilderDelegate(Transform parent);
+    
+    public static void AddElementToMainMenu(BuilderDelegate builderDelegate) => mainMenuBuilderDelegates += builderDelegate;
+    
+    public static void AddElementToEscapeMenu(BuilderDelegate builderDelegate) => escapeMenuBuilderDelegates += builderDelegate;
 
     public static void OpenPopup(string header, Color headerColor, string content, string buttonText, Action onClick) => MenuManager.instance.PagePopUp(header, headerColor, content, buttonText);
 
@@ -63,39 +41,74 @@ public static class MenuAPI
         MenuManager.instance.PagePopUpTwoOptions(menuButtonPopup, header, headerColor, content, leftButtonText, rightButtonText);
     }
 
-    internal static void Initialize()
+    public static REPOButton CreateREPOButton(string text, Action onClick = null, Transform parent = null, Vector2 localPosition = new())
     {
-        if (initialized)
-            return;
-        
-        var menuPages = MenuManager.instance.menuPages;
+        var newRectTransform = Object.Instantiate(REPOTemplates.buttonTemplate, parent);
+        newRectTransform.name = $"Menu Button - {text}";
 
-        foreach (var menuPageData in menuPages)
+        newRectTransform.localPosition = localPosition;
+        
+        var repoButton = newRectTransform.gameObject.AddComponent<REPOButton>();
+
+        repoButton.labelTMP.text = text;
+        repoButton.button.onClick = new Button.ButtonClickedEvent();
+        
+        if (onClick != null)
+            repoButton.button.onClick.AddListener(new UnityAction(onClick));
+
+		Object.Destroy(newRectTransform.GetComponent<MenuButtonPopUp>());
+        return repoButton;
+    }
+
+    public static REPOPopupPage CreatePopupPage(string headerText, bool pageDimmerVisibility = false, Vector2 localPosition = new())
+    {
+        var newRectTransform = Object.Instantiate(REPOTemplates.popupPageTemplate, MenuHolder.instance.transform);
+        newRectTransform.name = $"Menu Page {headerText}";
+
+        #warning fix positions, header, scroll, they all have to move together
+        //newRectTransform.localPosition = localPosition;
+        
+        var repoPopupPage = newRectTransform.gameObject.AddComponent<REPOPopupPage>();
+        repoPopupPage.pageDimmerVisibility = repoPopupPage;
+
+        repoPopupPage.headerTMP.text = headerText;
+        
+        Object.Destroy(newRectTransform.GetComponent<MenuPageSettingsPage>());
+        return repoPopupPage;
+    }
+
+    internal static void OpenPage(MenuPage menuPage, bool pageOnTop)
+    {
+        var currentMenuPage = REPOReflection.menuManager_CurrentMenuPage.GetValue(MenuManager.instance) as MenuPage;
+
+        var addedPagesOnTop = REPOReflection.menuManager_AddedPagesOnTop.GetValue(MenuManager.instance) as List<MenuPage>; 
+        
+        switch (pageOnTop)
         {
-            var menuPageTransform = menuPageData.menuPage.transform;
-            
-            switch (menuPageData.menuPageIndex)
-            {
-                case MenuPageIndex.Main:
-                    simplePageTemplate = (RectTransform) menuPageTransform;
-                    buttonTemplate = (RectTransform) simplePageTemplate.Find("Menu Button - Quit game");
-                    break;
-                case MenuPageIndex.Settings:
-                    pageDimmer = (RectTransform) menuPageTransform.GetChild(0);
-                    break;
-                case MenuPageIndex.SettingsGraphics:
-                    popupPageTemplate = (RectTransform) menuPageTransform;
-                    break;
-                case MenuPageIndex.SettingsAudio:
-                    toggleTemplate = (RectTransform) menuPageTransform.Find("Menu Scroll Box/Mask/Scroller/Bool Setting - Push to Talk");
-                    sliderTemplate = (RectTransform) menuPageTransform.Find("Menu Scroll Box/Mask/Scroller/Slider - microphone");
-                    break;
-                case MenuPageIndex.SettingsControls:
-                    keybindTemplate = (RectTransform) menuPageTransform.Find("Scroll Box/Mask/Scroller/Big Button move forward");
-                    break;
-            }
+            case true when addedPagesOnTop == null || addedPagesOnTop.Contains(currentMenuPage):
+                return;
+            case false:
+                REPOReflection.menuManager_PageInactiveAdd.Invoke(MenuManager.instance, [ currentMenuPage ]);
+                currentMenuPage?.PageStateSet(MenuPage.PageState.Inactive);
+                break;
         }
 
-        initialized = true;
+        menuPage.transform.localPosition = Vector3.zero;
+        MenuManager.instance.PageAdd(menuPage);
+        menuPage.StartCoroutine(REPOReflection.menuPage_LateStart.Invoke(menuPage, null) as IEnumerator);
+            
+        REPOReflection.menuPage_AddedPageOnTop.SetValue(menuPage, false);
+        
+        if (!pageOnTop)
+        {
+            MenuManager.instance.PageSetCurrent(menuPage.menuPageIndex, menuPage);
+        
+            REPOReflection.menuPage_PageIsOnTopOfOtherPage.SetValue(menuPage, true);
+            REPOReflection.menuPage_PageUnderThisPage.SetValue(menuPage, currentMenuPage);
+            return;
+        }
+        
+        REPOReflection.menuPage_ParentPage.SetValue(menuPage, currentMenuPage);
+        addedPagesOnTop.Add(menuPage);
     }
 }
