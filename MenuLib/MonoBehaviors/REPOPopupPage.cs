@@ -31,6 +31,8 @@ public sealed class REPOPopupPage : MonoBehaviour
         if (parentPage)
             MenuManager.instance.PageSetCurrent(parentPage.menuPageIndex, parentPage);
     }
+
+    public void AddElement(MenuAPI.BuilderDelegate builderDelegate) => builderDelegate.Invoke(transform);
     
     private void Awake()
     {
@@ -45,10 +47,9 @@ public sealed class REPOPopupPage : MonoBehaviour
 
         menuPage.menuPageIndex = (MenuPageIndex)(-1);
     }
-
-    //Control scroll visibility
+    
     private void Update()
     {
-        
+        //Control scroll visibility
     }
 }

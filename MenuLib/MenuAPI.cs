@@ -41,7 +41,7 @@ public static class MenuAPI
         MenuManager.instance.PagePopUpTwoOptions(menuButtonPopup, header, headerColor, content, leftButtonText, rightButtonText);
     }
 
-    public static REPOButton CreateREPOButton(string text, Action onClick = null, Transform parent = null, Vector2 localPosition = new())
+    public static REPOButton CreateREPOButton(string text, Action onClick, Transform parent, Vector2 localPosition = new())
     {
         var newRectTransform = Object.Instantiate(REPOTemplates.buttonTemplate, parent);
         newRectTransform.name = $"Menu Button - {text}";
@@ -65,7 +65,7 @@ public static class MenuAPI
         var newRectTransform = Object.Instantiate(REPOTemplates.popupPageTemplate, MenuHolder.instance.transform);
         newRectTransform.name = $"Menu Page {headerText}";
 
-        #warning fix positions, header, scroll, they all have to move together
+#warning fix positions, header, scroll, they all have to move together
         //newRectTransform.localPosition = localPosition;
         
         var repoPopupPage = newRectTransform.gameObject.AddComponent<REPOPopupPage>();
@@ -74,6 +74,8 @@ public static class MenuAPI
         repoPopupPage.headerTMP.text = headerText;
         
         Object.Destroy(newRectTransform.GetComponent<MenuPageSettingsPage>());
+        newRectTransform.gameObject.AddComponent<MenuPageSettings>();
+        
         return repoPopupPage;
     }
 
