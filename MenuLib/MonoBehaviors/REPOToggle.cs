@@ -5,57 +5,56 @@ using Button = UnityEngine.UI.Button;
 
 namespace MenuLib.MonoBehaviors;
 
-internal sealed class REPOMenuToggle : MonoBehaviour
+public sealed class REPOToggle : MonoBehaviour
 {
-    internal Action<bool> onValueChanged;
+    private static readonly Vector3 leftPosition = new(37.8f, 12.3f), leftScale = new(73f, 22f, 1f), rightPosition = new(112.644f, 12.3f), rightScale = new(74f, 22f, 1f);
+    
+    public TextMeshProUGUI labelTMP, leftButtonTMP, rightButtonTMP;
 
-    private TextMeshProUGUI labelTMP, leftButtonTMP, rightButtonTMP;
+    public Action<bool> onToggle;
+    
+    public bool state;
+    
+    internal Button leftButton, rightButton;
+    
     private RectTransform optionBox, optionBoxBehind;
-
     private Vector3 targetPosition, targetScale;
 
-    private readonly Vector3 leftPosition = new(37.8f, 12.3f),
-        rightPosition = new(112.644f, 12.3f),
-        leftScale = new(73f, 22f, 1f),
-        rightScale = new(74f, 22f, 1f);
-    
-    internal void Initialize(bool startingValue)
+    private void Awake()
     {
         labelTMP = GetComponentInChildren<TextMeshProUGUI>();
         optionBox = (RectTransform) transform.Find("Option Box");
         optionBoxBehind = (RectTransform) transform.Find("Option Box Behind");
         
-        labelTMP.rectTransform.sizeDelta = labelTMP.rectTransform.sizeDelta with { y = labelTMP.rectTransform.sizeDelta.y - 4};
-
         var buttons = GetComponentsInChildren<Button>();
         
-        var leftButton = buttons[0];
+        leftButton = buttons[0];
         leftButtonTMP = leftButton.GetComponentInChildren<TextMeshProUGUI>();
-        leftButton.onClick = new Button.ButtonClickedEvent();
-        leftButton.onClick.AddListener(() => SetState(true, true));
         
-        var rightButton = buttons[1];
+        rightButton = buttons[1];
         rightButtonTMP = rightButton.GetComponentInChildren<TextMeshProUGUI>();
-        rightButton.onClick.AddListener(() => SetState(false, true));
-        
-        SetState(startingValue, false);
     }
-
-    internal void SetState(bool state, bool invokeCallback)
+    
+    public void SetState(bool newState, bool invokeCallback)
     {
-        targetPosition = state ? leftPosition : rightPosition;
-        targetScale = state ? leftScale : rightScale;
+        if (state == newState)
+            return;
+        
+        targetPosition = newState ? leftPosition : rightPosition;
+        targetScale = newState ? leftScale : rightScale;
         
         if (invokeCallback)
-            onValueChanged.Invoke(state);
+            onToggle?.Invoke(newState);
+        
+        state = newState;
     }
 
-    internal void SetLeftButtonText(string text) => leftButtonTMP.text = text;
+    private void OnTransformParentChanged()
+    {
+        foreach (var menuButton in GetComponentsInChildren<MenuButton>())
+            REPOReflection.menuButton_ParentPage.SetValue(menuButton, GetComponentInParent<MenuPage>());
+    }
     
-    internal void SetRightButtonText(string text) => rightButtonTMP.text = text;
-    
-    internal void SetLabel(string label) => labelTMP.text = label;
-
     private void Update()
     {
         if (!optionBox || !optionBoxBehind)

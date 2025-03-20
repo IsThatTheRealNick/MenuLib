@@ -21,7 +21,8 @@ public static class MenuAPI
     public static void AddElementToMainMenu(BuilderDelegate builderDelegate) => mainMenuBuilderDelegates += builderDelegate;
     
     public static void AddElementToEscapeMenu(BuilderDelegate builderDelegate) => escapeMenuBuilderDelegates += builderDelegate;
-
+    
+#warning Might create custom versions of this
     public static void OpenPopup(string header, Color headerColor, string content, string buttonText, Action onClick) => MenuManager.instance.PagePopUp(header, headerColor, content, buttonText);
 
     public static void OpenPopup(string header, Color headerColor, string content, string leftButtonText, Action onLeftClicked, string rightButtonText, Action onRightClicked = null)
@@ -58,6 +59,32 @@ public static class MenuAPI
 
 		Object.Destroy(newRectTransform.GetComponent<MenuButtonPopUp>());
         return repoButton;
+    }
+    
+    public static REPOToggle CreateREPOToggle(string text, Action<bool> onToggle, Transform parent, Vector2 localPosition = new(), string leftButtonText = "ON", string rightButtonText = "OFF", bool defaultValue = false)
+    {
+        var newRectTransform = Object.Instantiate(REPOTemplates.toggleTemplate, parent);
+        newRectTransform.name = $"Menu Toggle - {text}";
+
+        newRectTransform.localPosition = localPosition;
+        
+        var repoToggle = newRectTransform.gameObject.AddComponent<REPOToggle>();
+
+        repoToggle.labelTMP.text = text;
+        repoToggle.leftButtonTMP.text = leftButtonText;
+        repoToggle.rightButtonTMP.text = rightButtonText;
+        repoToggle.onToggle = onToggle;
+        
+        repoToggle.leftButton.onClick = new Button.ButtonClickedEvent();
+        repoToggle.rightButton.onClick = new Button.ButtonClickedEvent();
+        
+        repoToggle.leftButton.onClick.AddListener(() => repoToggle.SetState(true, true));
+        repoToggle.rightButton.onClick.AddListener(() => repoToggle.SetState(false, true));
+        
+        repoToggle.SetState(defaultValue, false);
+        
+        Object.Destroy(newRectTransform.GetComponent<MenuTwoOptions>());
+        return repoToggle;
     }
 
     public static REPOPopupPage CreatePopupPage(string headerText, bool pageDimmerVisibility = false, Vector2 localPosition = new())
