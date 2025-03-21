@@ -52,12 +52,10 @@ public static class MenuAPI
         var repoButton = newRectTransform.gameObject.AddComponent<REPOButton>();
 
         repoButton.labelTMP.text = text;
-        repoButton.button.onClick = new Button.ButtonClickedEvent();
         
         if (onClick != null)
             repoButton.button.onClick.AddListener(new UnityAction(onClick));
-
-		Object.Destroy(newRectTransform.GetComponent<MenuButtonPopUp>());
+        
         return repoButton;
     }
     
@@ -75,15 +73,7 @@ public static class MenuAPI
         repoToggle.rightButtonTMP.text = rightButtonText;
         repoToggle.onToggle = onToggle;
         
-        repoToggle.leftButton.onClick = new Button.ButtonClickedEvent();
-        repoToggle.rightButton.onClick = new Button.ButtonClickedEvent();
-        
-        repoToggle.leftButton.onClick.AddListener(() => repoToggle.SetState(true, true));
-        repoToggle.rightButton.onClick.AddListener(() => repoToggle.SetState(false, true));
-        
         repoToggle.SetState(defaultValue, false);
-        
-        Object.Destroy(newRectTransform.GetComponent<MenuTwoOptions>());
         return repoToggle;
     }
 
@@ -91,17 +81,12 @@ public static class MenuAPI
     {
         var newRectTransform = Object.Instantiate(REPOTemplates.popupPageTemplate, MenuHolder.instance.transform);
         newRectTransform.name = $"Menu Page {headerText}";
-
-#warning fix positions, header, scroll, they all have to move together
-        //newRectTransform.localPosition = localPosition;
         
         var repoPopupPage = newRectTransform.gameObject.AddComponent<REPOPopupPage>();
-        repoPopupPage.pageDimmerVisibility = repoPopupPage;
-
-        repoPopupPage.headerTMP.text = headerText;
         
-        Object.Destroy(newRectTransform.GetComponent<MenuPageSettingsPage>());
-        newRectTransform.gameObject.AddComponent<MenuPageSettings>();
+        repoPopupPage.rectTransform.localPosition = localPosition;
+        repoPopupPage.pageDimmerVisibility = pageDimmerVisibility;
+        repoPopupPage.headerTMP.text = headerText;
         
         return repoPopupPage;
     }

@@ -2,6 +2,7 @@
 using TMPro;
 using UnityEngine;
 using Button = UnityEngine.UI.Button;
+using Object = UnityEngine.Object;
 
 namespace MenuLib.MonoBehaviors;
 
@@ -13,9 +14,7 @@ public sealed class REPOToggle : MonoBehaviour
 
     public Action<bool> onToggle;
     
-    public bool state;
-    
-    internal Button leftButton, rightButton;
+    public bool state { get; private set; }
     
     private RectTransform optionBox, optionBoxBehind;
     private Vector3 targetPosition, targetScale;
@@ -28,11 +27,18 @@ public sealed class REPOToggle : MonoBehaviour
         
         var buttons = GetComponentsInChildren<Button>();
         
-        leftButton = buttons[0];
+        var leftButton = buttons[0];
+        leftButton.onClick = new Button.ButtonClickedEvent();
+        leftButton.onClick.AddListener(() => SetState(true, true));
+        
         leftButtonTMP = leftButton.GetComponentInChildren<TextMeshProUGUI>();
         
-        rightButton = buttons[1];
+        var rightButton = buttons[1];
+        rightButton.onClick = new Button.ButtonClickedEvent();
+        rightButton.onClick.AddListener(() => SetState(false, true));
         rightButtonTMP = rightButton.GetComponentInChildren<TextMeshProUGUI>();
+
+        Destroy(GetComponent<MenuTwoOptions>());
     }
     
     public void SetState(bool newState, bool invokeCallback)

@@ -21,6 +21,9 @@ public sealed class REPOButton : MonoBehaviour
         button = GetComponent<Button>();
         menuButton = GetComponent<MenuButton>();
         labelTMP = GetComponentInChildren<TextMeshProUGUI>();
+        
+        button.onClick = new Button.ButtonClickedEvent();
+        Destroy(GetComponent<MenuButtonPopUp>());
     }
 
     private void Update()

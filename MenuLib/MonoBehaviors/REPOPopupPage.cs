@@ -36,9 +36,6 @@ public sealed class REPOPopupPage : MonoBehaviour
     
     private void Awake()
     {
-        #warning fix positions, header, scroll, they all have to move together
-        rectTransform = transform as RectTransform;
-        
         menuPage = GetComponent<MenuPage>();
         headerTMP = GetComponentInChildren<TextMeshProUGUI>();
         
@@ -46,6 +43,16 @@ public sealed class REPOPopupPage : MonoBehaviour
         pageDimmerGameObject.transform.SetAsFirstSibling();
 
         menuPage.menuPageIndex = (MenuPageIndex)(-1);
+     
+        rectTransform = (RectTransform) new GameObject("Page Content", typeof(RectTransform)).transform;
+        rectTransform.SetParent(transform);
+        
+        transform.Find("Panel").SetParent(rectTransform);
+        headerTMP.transform.parent.SetParent(rectTransform);
+        transform.Find("Menu Scroll Box").SetParent(rectTransform);
+        
+        Destroy(GetComponent<MenuPageSettingsPage>());
+        gameObject.AddComponent<MenuPageSettings>();
     }
     
     private void Update()
