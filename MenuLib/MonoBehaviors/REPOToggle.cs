@@ -1,15 +1,16 @@
 ﻿using System;
+using MenuLib.Interfaces;
 using TMPro;
 using UnityEngine;
 using Button = UnityEngine.UI.Button;
-using Object = UnityEngine.Object;
 
 namespace MenuLib.MonoBehaviors;
 
-public sealed class REPOToggle : MonoBehaviour
+public sealed class REPOToggle : MonoBehaviour, IREPOElement
 {
     private static readonly Vector3 leftPosition = new(37.8f, 12.3f), leftScale = new(73f, 22f, 1f), rightPosition = new(112.644f, 12.3f), rightScale = new(74f, 22f, 1f);
-    
+
+    public RectTransform rectTransform { get; private set; }
     public TextMeshProUGUI labelTMP, leftButtonTMP, rightButtonTMP;
 
     public Action<bool> onToggle;
@@ -18,9 +19,24 @@ public sealed class REPOToggle : MonoBehaviour
     
     private RectTransform optionBox, optionBoxBehind;
     private Vector3 targetPosition, targetScale;
+    
+    public void SetState(bool newState, bool invokeCallback)
+    {
+        if (state == newState)
+            return;
+        
+        targetPosition = newState ? leftPosition : rightPosition;
+        targetScale = newState ? leftScale : rightScale;
+        
+        if (invokeCallback)
+            onToggle?.Invoke(newState);
+        
+        state = newState;
+    }
 
     private void Awake()
     {
+        rectTransform = transform as RectTransform;
         labelTMP = GetComponentInChildren<TextMeshProUGUI>();
         optionBox = (RectTransform) transform.Find("Option Box");
         optionBoxBehind = (RectTransform) transform.Find("Option Box Behind");
@@ -41,20 +57,6 @@ public sealed class REPOToggle : MonoBehaviour
         Destroy(GetComponent<MenuTwoOptions>());
     }
     
-    public void SetState(bool newState, bool invokeCallback)
-    {
-        if (state == newState)
-            return;
-        
-        targetPosition = newState ? leftPosition : rightPosition;
-        targetScale = newState ? leftScale : rightScale;
-        
-        if (invokeCallback)
-            onToggle?.Invoke(newState);
-        
-        state = newState;
-    }
-
     private void OnTransformParentChanged()
     {
         foreach (var menuButton in GetComponentsInChildren<MenuButton>())

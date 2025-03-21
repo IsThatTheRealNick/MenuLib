@@ -1,12 +1,13 @@
-﻿using TMPro;
+﻿using MenuLib.Interfaces;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace MenuLib.MonoBehaviors;
 
-public sealed class REPOButton : MonoBehaviour
+public sealed class REPOButton : MonoBehaviour, IREPOElement
 {
-    public RectTransform rectTransform;
+    public RectTransform rectTransform { get; private set; }
     
     public Button button;
     public MenuButton menuButton;
@@ -14,6 +15,8 @@ public sealed class REPOButton : MonoBehaviour
     public TextMeshProUGUI labelTMP;
 
     private string currentText;
+    
+    public Vector2 GetLabelSize() => labelTMP.GetPreferredValues();
     
     private void Awake()
     {
@@ -31,9 +34,11 @@ public sealed class REPOButton : MonoBehaviour
         if (labelTMP.text == currentText)
             return;
 
-        rectTransform.sizeDelta = labelTMP.GetPreferredValues();
+        rectTransform.sizeDelta = GetPreferredTextSize();
         currentText = labelTMP.text;
     }
+    
+    public Vector2 GetPreferredTextSize() => labelTMP.GetPreferredValues(); 
 
     private void OnTransformParentChanged() => REPOReflection.menuButton_ParentPage.SetValue(menuButton, GetComponentInParent<MenuPage>());
 }

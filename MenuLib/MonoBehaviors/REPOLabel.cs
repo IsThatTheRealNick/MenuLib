@@ -1,16 +1,17 @@
-﻿using TMPro;
+﻿using MenuLib.Interfaces;
+using TMPro;
 using UnityEngine;
 
 namespace MenuLib.MonoBehaviors;
 
-public sealed class REPOLabel : MonoBehaviour
+public sealed class REPOLabel : MonoBehaviour, IREPOElement
 {
-    public RectTransform rectTransform;
+    public RectTransform rectTransform { get; private set; }
     public TextMeshProUGUI labelTMP;
     
     private void Awake()
     {
-        rectTransform = GetComponent<RectTransform>();
+        rectTransform = (RectTransform) transform;
         labelTMP = GetComponentInChildren<TextMeshProUGUI>();
 
         labelTMP.rectTransform.pivot = rectTransform.pivot = Vector2.zero;

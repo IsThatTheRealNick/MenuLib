@@ -42,7 +42,7 @@ public static class MenuAPI
         
         MenuManager.instance.PagePopUpTwoOptions(menuButtonPopup, header, headerColor, content, leftButtonText, rightButtonText);
     }
-
+    
     public static REPOButton CreateREPOButton(string text, Action onClick, Transform parent, Vector2 localPosition = default)
     {
         var newRectTransform = Object.Instantiate(REPOTemplates.buttonTemplate, parent);
@@ -90,6 +90,16 @@ public static class MenuAPI
         repoLabel.labelTMP.text = text;
         
         return repoLabel;
+    }
+    
+    public static REPOSpacer CreateREPOSpacer(Transform parent, Vector2 localPosition = default, Vector2 size = default)
+    {
+        var newRectTransform = (RectTransform) new GameObject("Spacer", typeof(RectTransform)).transform;
+
+        newRectTransform.SetParent(parent);
+        newRectTransform.localPosition = localPosition;
+        
+        return newRectTransform.gameObject.AddComponent<REPOSpacer>();
     }
     
     public static REPOPopupPage CreateREPOPopupPage(string headerText, REPOPopupPage.PresetSide presetSide, bool pageDimmerVisibility = false) => CreatePopupPage(headerText, pageDimmerVisibility, presetSide == REPOPopupPage.PresetSide.Left ? null : new Vector2(40, 0));

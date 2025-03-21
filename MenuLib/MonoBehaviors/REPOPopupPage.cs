@@ -1,10 +1,11 @@
-﻿using MenuLib.Structs;
+﻿using MenuLib.Interfaces;
+using MenuLib.Structs;
 using TMPro;
 using UnityEngine;
 
 namespace MenuLib.MonoBehaviors;
 
-public sealed class REPOPopupPage : MonoBehaviour
+public sealed class REPOPopupPage : MonoBehaviour, IREPOElement
 {
     public enum PresetSide
     {
@@ -13,8 +14,9 @@ public sealed class REPOPopupPage : MonoBehaviour
     }
  
     public delegate RectTransform ScrollViewBuilderDelegate(Transform scrollView);
-    
-    public RectTransform rectTransform;
+ 
+    public RectTransform rectTransform { get; private set; }
+    public RectTransform maskRectTransform, scrollBarRectTransform;
     public MenuPage menuPage;
     public TextMeshProUGUI headerTMP;
     public MenuScrollBox menuScrollBox;
@@ -49,8 +51,6 @@ public sealed class REPOPopupPage : MonoBehaviour
         }
     }
     
-    public RectTransform maskRectTransform, scrollBarRectTransform;
-    
     private GameObject pageDimmerGameObject;
     private REPOScrollView scrollView;
 
@@ -73,12 +73,25 @@ public sealed class REPOPopupPage : MonoBehaviour
     }
     
     public void AddElement(MenuAPI.BuilderDelegate builderDelegate) => builderDelegate?.Invoke(transform);
-
+    
+    public void AddElement(RectTransform elementRectTransform, Transform parent, Vector2 localPosition = default)
+    {
+        elementRectTransform.SetParent(parent);
+        elementRectTransform.localPosition = localPosition;
+    }
+    
     public void AddElementToScrollView(ScrollViewBuilderDelegate scrollViewBuilderDelegate)
     {
-        var repoScrollViewElement = scrollViewBuilderDelegate?.Invoke(menuScrollBox.scroller)?.gameObject.AddComponent<REPOScrollViewElement>();
-
-        if (repoScrollViewElement)
+        if (scrollViewBuilderDelegate?.Invoke(menuScrollBox.scroller)?.gameObject.AddComponent<REPOScrollViewElement>() is { } repoScrollViewElement)
+            repoScrollViewElement.onActiveStateChanged += scrollView.UpdateElements;
+    }
+    
+    public void AddElementToScrollView(RectTransform elementRectTransform, Transform parent, Vector2 localPosition = default)
+    {
+        elementRectTransform.SetParent(parent);
+        elementRectTransform.localPosition = localPosition;
+        
+        if (elementRectTransform.gameObject.AddComponent<REPOScrollViewElement>() is { } repoScrollViewElement)
             repoScrollViewElement.onActiveStateChanged += scrollView.UpdateElements;
     }
     
