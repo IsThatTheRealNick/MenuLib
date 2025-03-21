@@ -49,9 +49,10 @@ public sealed class REPOPopupPage : MonoBehaviour
         }
     }
     
+    internal RectTransform maskRectTransform, scrollBarRectTransform;
+    
     private GameObject pageDimmerGameObject;
     private REPOScrollView scrollView;
-    private RectTransform maskRectTransform;
 
     private Vector2 defaultMaskSizeDelta, defaultMaskPosition;
     private Padding _maskPadding;
@@ -113,7 +114,30 @@ public sealed class REPOPopupPage : MonoBehaviour
 
         maskPadding = new Padding(0, 0, 0, 25);
         
+        scrollBarRectTransform = (RectTransform) menuScrollBox.scrollBar.transform;
+        var scrollBarFillRectTransform = (RectTransform) scrollBarRectTransform.Find("Scroll Bar Bg (2)");
+        var scrollBarOutlineRectTransform = (RectTransform) scrollBarRectTransform.Find("Scroll Bar Bg (1)");
+        
+        var mainScrollBarPosition = scrollBarRectTransform.localPosition;
+        mainScrollBarPosition.y = maskRectTransform.localPosition.y;
+        scrollBarRectTransform.localPosition = mainScrollBarPosition;
+
+        var scrollBarSize = scrollBarRectTransform.sizeDelta;
+        scrollBarSize.y = maskRectTransform.sizeDelta.y;
+        menuScrollBox.scrollBarBackground.sizeDelta = scrollBarFillRectTransform.sizeDelta = scrollBarRectTransform.sizeDelta = scrollBarSize;
+
+        scrollBarOutlineRectTransform.sizeDelta = scrollBarSize + new Vector2(4f, 4f);
+        
+        REPOReflection.menuPage_ScrollBoxes.SetValue(menuPage, 0);
+        scrollBarRectTransform.gameObject.SetActive(false);
+        
         Destroy(GetComponent<MenuPageSettingsPage>());
         gameObject.AddComponent<MenuPageSettings>();
+    }
+
+    private void Start()
+    {
+        REPOReflection.menuScrollBox_scrollerEndPosition.SetValue(menuScrollBox, 0);
+        menuScrollBox.scroller.localPosition = menuScrollBox.scroller.localPosition with { y = 0 };
     }
 }

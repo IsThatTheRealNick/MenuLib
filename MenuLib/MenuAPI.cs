@@ -21,6 +21,8 @@ public static class MenuAPI
     
     public static void AddElementToEscapeMenu(BuilderDelegate builderDelegate) => escapeMenuBuilderDelegates += builderDelegate;
 
+    public static void CloseAllPagesAddedOnTop() => MenuManager.instance.PageCloseAllAddedOnTop();
+    
 #warning Might create custom versions of this
     public static void OpenPopup(string header, Color headerColor, string content, string buttonText, Action onClick) => MenuManager.instance.PagePopUp(header, headerColor, content, buttonText);
 
