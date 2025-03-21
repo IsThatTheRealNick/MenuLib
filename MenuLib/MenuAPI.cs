@@ -10,8 +10,7 @@ namespace MenuLib;
 
 public static class MenuAPI
 {
-    internal static BuilderDelegate mainMenuBuilderDelegates;
-    internal static BuilderDelegate escapeMenuBuilderDelegates;
+    internal static BuilderDelegate mainMenuBuilderDelegates, escapeMenuBuilderDelegates, lobbyMenuBuilderDelegate;
 
     private static MenuButtonPopUp menuButtonPopup;
     
@@ -20,6 +19,8 @@ public static class MenuAPI
     public static void AddElementToMainMenu(BuilderDelegate builderDelegate) => mainMenuBuilderDelegates += builderDelegate;
     
     public static void AddElementToEscapeMenu(BuilderDelegate builderDelegate) => escapeMenuBuilderDelegates += builderDelegate;
+    
+    public static void AddElementToLobbyMenu(BuilderDelegate builderDelegate) => lobbyMenuBuilderDelegate += builderDelegate;
 
     public static void CloseAllPagesAddedOnTop() => MenuManager.instance.PageCloseAllAddedOnTop();
     

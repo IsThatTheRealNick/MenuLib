@@ -27,6 +27,12 @@ namespace MenuLib
             orig.Invoke(self);
 			MenuAPI.escapeMenuBuilderDelegates?.Invoke(self.transform);
         }
+        
+        private static void MenuPageLobby_StartHook(Action<MenuPageLobby> orig, MenuPageLobby self)
+        {
+            orig.Invoke(self);
+            MenuAPI.lobbyMenuBuilderDelegate?.Invoke(self.transform);
+        }
 
         private static void SemiFunc_UIMouseHoverILHook(ILContext il)
         {
@@ -57,64 +63,6 @@ namespace MenuLib
             cursor.MarkLabel(jumpToLabel);
         }
         
-        private static void MenuScrollBox_StartILHook(ILContext il)
-        {
-            var cursor = new ILCursor(il);
-
-            cursor.GotoNext(instruction => instruction.MatchLdfld<MenuScrollBox>("scrollHandle"));
-
-            cursor.Index -= 2;
-
-            cursor.RemoveRange(97);
-
-            cursor.Emit(OpCodes.Ldarg_0);
-            cursor.EmitDelegate((MenuScrollBox menuScrollBox) =>
-            {
-                var mask = (RectTransform) menuScrollBox.scroller.parent;
-                
-                var minY = float.MaxValue;
-                var maxY = float.MinValue;
-
-                for (var i = 0; i < menuScrollBox.scroller.childCount; i++)
-                {
-                    if (i <= 2)
-                        continue;
-                
-                    var child = menuScrollBox.scroller.GetChild(i) as RectTransform;
-                
-                    var corners = new Vector3[4];
-                    child!.GetWorldCorners(corners);
-                
-                    for (var j = 0; j < 4; j++)
-                        corners[j] = menuScrollBox.scroller.InverseTransformPoint(corners[j]);
-                
-                    var childMinY = Mathf.Min(corners[0].y, corners[1].y, corners[2].y, corners[3].y);
-                    var childMaxY = Mathf.Max(corners[0].y, corners[1].y, corners[2].y, corners[3].y);
-        
-                    minY = Mathf.Min(minY, childMinY);
-                    maxY = Mathf.Max(maxY, childMaxY);
-                }
-
-                var height = Math.Abs(maxY - minY);
-            
-                AccessTools.Field(typeof(MenuScrollBox), "scrollHeight").SetValue(menuScrollBox, height);
-                AccessTools.Field(typeof(MenuScrollBox), "scrollerStartPosition").SetValue(menuScrollBox, height + 42f);
-                AccessTools.Field(typeof(MenuScrollBox), "scrollerEndPosition").SetValue(menuScrollBox, menuScrollBox.scroller.localPosition.y);
-
-                if (height < mask.sizeDelta.y)
-                    menuScrollBox.scrollBar.SetActive(false);
-                else
-                {
-                    var parentPage = AccessTools.Field(typeof(MenuScrollBox), "parentPage").GetValue(menuScrollBox);
-                    
-                    menuScrollBox.scrollBar.SetActive(true);
-                
-                    var scrollBoxesFieldInfo = AccessTools.Field(typeof(MenuPage), "scrollBoxes"); 
-                    scrollBoxesFieldInfo.SetValue(parentPage, (int) scrollBoxesFieldInfo.GetValue(parentPage) + 1);
-                }
-            });
-        }
-        
         private void Awake()
         {
             logger.LogDebug("Hooking `MenuPageMain.Start`");
@@ -123,12 +71,11 @@ namespace MenuLib
             logger.LogDebug("Hooking `MenuPageEsc.Start`");
             new Hook(AccessTools.Method(typeof(MenuPageEsc), "Start"), MenuPageEsc_StartHook);
             
+            logger.LogDebug("Hooking `MenuPageLobby.Start`");
+            new Hook(AccessTools.Method(typeof(MenuPageLobby), "Start"), MenuPageLobby_StartHook);
+            
             logger.LogDebug("Hooking `SemiFunc.UIMouseHover`");
             new ILHook(AccessTools.Method(typeof(SemiFunc), "UIMouseHover"), SemiFunc_UIMouseHoverILHook);
-            
-            //Requires a rewrite
-            /*logger.LogDebug("Hooking `MenuScrollBox.Start`");
-            new ILHook(AccessTools.Method(typeof(MenuScrollBox), "Start"), MenuScrollBox_StartILHook);*/
         }
     }
 }
