@@ -74,9 +74,9 @@ public sealed class REPOPopupPage : MonoBehaviour, IREPOElement
     
     public void AddElement(MenuAPI.BuilderDelegate builderDelegate) => builderDelegate?.Invoke(transform);
     
-    public void AddElement(RectTransform elementRectTransform, Transform parent, Vector2 localPosition = default)
+    public void AddElement(RectTransform elementRectTransform, Vector2 localPosition = default)
     {
-        elementRectTransform.SetParent(parent);
+        elementRectTransform.SetParent(transform);
         elementRectTransform.localPosition = localPosition;
     }
     
@@ -86,9 +86,9 @@ public sealed class REPOPopupPage : MonoBehaviour, IREPOElement
             repoScrollViewElement.onActiveStateChanged += scrollView.UpdateElements;
     }
     
-    public void AddElementToScrollView(RectTransform elementRectTransform, Transform parent, Vector2 localPosition = default)
+    public void AddElementToScrollView(RectTransform elementRectTransform, Vector2 localPosition = default)
     {
-        elementRectTransform.SetParent(parent);
+        elementRectTransform.SetParent(menuScrollBox.scroller);
         elementRectTransform.localPosition = localPosition;
         
         if (elementRectTransform.gameObject.AddComponent<REPOScrollViewElement>() is { } repoScrollViewElement)
