@@ -78,7 +78,21 @@ public static class MenuAPI
         return repoToggle;
     }
 
-    public static REPOPopupPage CreatePopupPage(string headerText, REPOPopupPage.PresetSide presetSide, bool pageDimmerVisibility = false) => CreatePopupPage(headerText, pageDimmerVisibility, presetSide == REPOPopupPage.PresetSide.Left ? null : new Vector2(40, 0));
+    public static REPOLabel CreateREPOLabel(string text, Transform parent, Vector2 localPosition = default)
+    {
+        var newRectTransform = Object.Instantiate(REPOTemplates.labelTemplate, parent);
+        newRectTransform.name = $"Label - {text}";
+
+        newRectTransform.localPosition = localPosition;
+        
+        var repoLabel = newRectTransform.gameObject.AddComponent<REPOLabel>();
+
+        repoLabel.labelTMP.text = text;
+        
+        return repoLabel;
+    }
+    
+    public static REPOPopupPage CreateREPOPopupPage(string headerText, REPOPopupPage.PresetSide presetSide, bool pageDimmerVisibility = false) => CreatePopupPage(headerText, pageDimmerVisibility, presetSide == REPOPopupPage.PresetSide.Left ? null : new Vector2(40, 0));
     
     public static REPOPopupPage CreatePopupPage(string headerText, bool pageDimmerVisibility = false, Vector2? localPosition = null)
     {

@@ -12,7 +12,7 @@ public sealed class REPOPopupPage : MonoBehaviour
         Right
     }
  
-    public delegate RectTransform BuilderDelegate(Transform parent);
+    public delegate RectTransform ScrollViewBuilderDelegate(Transform scrollView);
     
     public RectTransform rectTransform;
     public MenuPage menuPage;
@@ -74,9 +74,9 @@ public sealed class REPOPopupPage : MonoBehaviour
     
     public void AddElement(MenuAPI.BuilderDelegate builderDelegate) => builderDelegate?.Invoke(transform);
 
-    public void AddElementToScrollView(BuilderDelegate builderDelegate)
+    public void AddElementToScrollView(ScrollViewBuilderDelegate scrollViewBuilderDelegate)
     {
-        var repoScrollViewElement = builderDelegate?.Invoke(menuScrollBox.scroller)?.gameObject.AddComponent<REPOScrollViewElement>();
+        var repoScrollViewElement = scrollViewBuilderDelegate?.Invoke(menuScrollBox.scroller)?.gameObject.AddComponent<REPOScrollViewElement>();
 
         if (repoScrollViewElement)
             repoScrollViewElement.onActiveStateChanged += scrollView.UpdateElements;
@@ -106,6 +106,7 @@ public sealed class REPOPopupPage : MonoBehaviour
             Destroy(scroller.GetChild(i).gameObject);
 
         scrollView = scroller.gameObject.AddComponent<REPOScrollView>();
+        scrollView.popupPage = this;
         
         maskRectTransform = (RectTransform) scroller.parent;
 
@@ -113,6 +114,8 @@ public sealed class REPOPopupPage : MonoBehaviour
         defaultMaskPosition = maskRectTransform.localPosition;
 
         maskPadding = new Padding(0, 0, 0, 25);
+
+        menuScrollBox.scroller.sizeDelta = maskRectTransform.sizeDelta;
         
         scrollBarRectTransform = (RectTransform) menuScrollBox.scrollBar.transform;
         var scrollBarFillRectTransform = (RectTransform) scrollBarRectTransform.Find("Scroll Bar Bg (2)");

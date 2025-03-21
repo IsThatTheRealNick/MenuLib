@@ -5,7 +5,7 @@ namespace MenuLib.MonoBehaviors;
 
 internal sealed class REPOScrollView : MonoBehaviour
 {
-    private REPOPopupPage popupPage;
+    internal REPOPopupPage popupPage;
     
     public void UpdateElements()
     {
@@ -28,15 +28,23 @@ internal sealed class REPOScrollView : MonoBehaviour
             child.localPosition = localPosition;
         }
         
-        popupPage.scrollBarRectTransform.gameObject.SetActive(lastElementYPosition < 0);
-
+        var scrollBarGameObject = popupPage.scrollBarRectTransform.gameObject;
         var menuScrollBox = popupPage.menuScrollBox;
+        
+        switch (lastElementYPosition)
+        {
+            case < 0 when !scrollBarGameObject.activeSelf:
+                popupPage.scrollBarRectTransform.gameObject.SetActive(true);
+                break;
+            case >= 0 when scrollBarGameObject.activeSelf:
+                popupPage.scrollBarRectTransform.gameObject.SetActive(false);
+                menuScrollBox.scroller.localPosition = menuScrollBox.scroller.localPosition with { y = 0 };
+                break;
+        }
         
         var divisor = 1f - menuScrollBox.scrollHandle.rect.height * .5f / menuScrollBox.scrollBarBackground.rect.height * 1.1f;
         REPOReflection.menuScrollBox_scrollerStartPosition.SetValue(menuScrollBox, Math.Abs(lastElementYPosition/divisor));
     }
-
-    private void Awake() => popupPage = GetComponentInParent<REPOPopupPage>();
 
     private void OnTransformChildrenChanged() => UpdateElements();
 }

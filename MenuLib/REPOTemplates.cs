@@ -11,7 +11,7 @@ internal static class REPOTemplates
     internal static readonly RectTransform toggleTemplate;
     internal static readonly RectTransform sliderTemplate;
     internal static readonly RectTransform keybindTemplate;
-    internal static readonly RectTransform categoryTemplate;
+    internal static readonly RectTransform labelTemplate;
 
     static REPOTemplates()
     {
@@ -50,7 +50,7 @@ internal static class REPOTemplates
                 {
                     var scroller = menuPageTransform.Find("Scroll Box/Mask/Scroller");
                     keybindTemplate = (RectTransform) scroller.Find("Big Button move forward");
-                    categoryTemplate = (RectTransform) scroller.Find("Header Movement");
+                    labelTemplate = (RectTransform) scroller.Find("Header Movement");
                     break;
                 }
             }
