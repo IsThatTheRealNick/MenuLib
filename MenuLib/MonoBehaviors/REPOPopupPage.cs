@@ -73,7 +73,7 @@ public sealed class REPOPopupPage : MonoBehaviour
     
     public void AddElement(MenuAPI.BuilderDelegate builderDelegate) => builderDelegate?.Invoke(transform);
 
-    public void AddElementToScrollView(BuilderDelegate builderDelegate, bool elementIgnoresLayout = false)
+    public void AddElementToScrollView(BuilderDelegate builderDelegate)
     {
         var repoScrollViewElement = builderDelegate?.Invoke(menuScrollBox.scroller)?.gameObject.AddComponent<REPOScrollViewElement>();
         
