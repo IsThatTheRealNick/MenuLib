@@ -5,10 +5,17 @@ namespace MenuLib.MonoBehaviors;
 
 public sealed class REPOPopupPage : MonoBehaviour
 {
+    public enum PresetSide
+    {
+        Left,
+        Right
+    }
+    
     public RectTransform rectTransform;
     public MenuPage menuPage;
     public TextMeshProUGUI headerTMP;
-
+    public MenuScrollBox menuScrollBox;
+    
     public bool pageDimmerVisibility
     {
         get => pageDimmerGameObject.gameObject.activeSelf;
@@ -31,25 +38,29 @@ public sealed class REPOPopupPage : MonoBehaviour
         if (parentPage)
             MenuManager.instance.PageSetCurrent(parentPage.menuPageIndex, parentPage);
     }
-
+    
     public void AddElement(MenuAPI.BuilderDelegate builderDelegate) => builderDelegate.Invoke(transform);
+    
+#warning This will have layout settings
+    public void AddElementToScrollView(MenuAPI.BuilderDelegate builderDelegate, bool elementIgnoresLayout = false) => builderDelegate.Invoke(menuScrollBox.scroller);
     
     private void Awake()
     {
         menuPage = GetComponent<MenuPage>();
         headerTMP = GetComponentInChildren<TextMeshProUGUI>();
+        menuScrollBox = GetComponentInChildren<MenuScrollBox>();
         
         pageDimmerGameObject = Instantiate(REPOTemplates.pageDimmerTemplate, transform).gameObject;
         pageDimmerGameObject.transform.SetAsFirstSibling();
 
-        menuPage.menuPageIndex = (MenuPageIndex)(-1);
+        menuPage.menuPageIndex = (MenuPageIndex) (-1);
      
         rectTransform = (RectTransform) new GameObject("Page Content", typeof(RectTransform)).transform;
         rectTransform.SetParent(transform);
         
         transform.Find("Panel").SetParent(rectTransform);
         headerTMP.transform.parent.SetParent(rectTransform);
-        transform.Find("Menu Scroll Box").SetParent(rectTransform);
+        menuScrollBox.transform.SetParent(rectTransform);
         
         Destroy(GetComponent<MenuPageSettingsPage>());
         gameObject.AddComponent<MenuPageSettings>();

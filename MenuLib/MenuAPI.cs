@@ -77,14 +77,16 @@ public static class MenuAPI
         return repoToggle;
     }
 
-    public static REPOPopupPage CreatePopupPage(string headerText, bool pageDimmerVisibility = false, Vector2 localPosition = new())
+    public static REPOPopupPage CreatePopupPage(string headerText, REPOPopupPage.PresetSide presetSide, bool pageDimmerVisibility = false) => CreatePopupPage(headerText, pageDimmerVisibility, presetSide == REPOPopupPage.PresetSide.Left ? null : new Vector2(40, 0));
+    
+    public static REPOPopupPage CreatePopupPage(string headerText, bool pageDimmerVisibility = false, Vector2? localPosition = null)
     {
         var newRectTransform = Object.Instantiate(REPOTemplates.popupPageTemplate, MenuHolder.instance.transform);
         newRectTransform.name = $"Menu Page {headerText}";
         
         var repoPopupPage = newRectTransform.gameObject.AddComponent<REPOPopupPage>();
         
-        repoPopupPage.rectTransform.localPosition = localPosition;
+        repoPopupPage.rectTransform.localPosition = localPosition ?? new Vector2(-280, 0);
         repoPopupPage.pageDimmerVisibility = pageDimmerVisibility;
         repoPopupPage.headerTMP.text = headerText;
         
@@ -106,7 +108,8 @@ public static class MenuAPI
                 currentMenuPage?.PageStateSet(MenuPage.PageState.Inactive);
                 break;
         }
-
+        
+        menuPage.gameObject.SetActive(true);
         menuPage.transform.localPosition = Vector3.zero;
         MenuManager.instance.PageAdd(menuPage);
         menuPage.StartCoroutine(REPOReflection.menuPage_LateStart.Invoke(menuPage, null) as IEnumerator);
