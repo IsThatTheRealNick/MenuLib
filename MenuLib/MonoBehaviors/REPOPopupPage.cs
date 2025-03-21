@@ -49,7 +49,7 @@ public sealed class REPOPopupPage : MonoBehaviour
         }
     }
     
-    internal RectTransform maskRectTransform, scrollBarRectTransform;
+    public RectTransform maskRectTransform, scrollBarRectTransform;
     
     private GameObject pageDimmerGameObject;
     private REPOScrollView scrollView;
