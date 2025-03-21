@@ -6,6 +6,10 @@ namespace MenuLib.MonoBehaviors;
 public sealed class REPOSpacer : MonoBehaviour, IREPOElement
 {
     public RectTransform rectTransform { get; private set; }
-    
-    private void Awake() => rectTransform = transform as RectTransform;
+
+    private void Awake()
+    {
+        rectTransform = (RectTransform) transform;
+        rectTransform.pivot = Vector2.zero;
+    }
 }

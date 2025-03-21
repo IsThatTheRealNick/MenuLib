@@ -97,9 +97,13 @@ public static class MenuAPI
         var newRectTransform = (RectTransform) new GameObject("Spacer", typeof(RectTransform)).transform;
 
         newRectTransform.SetParent(parent);
-        newRectTransform.localPosition = localPosition;
         
-        return newRectTransform.gameObject.AddComponent<REPOSpacer>();
+        var repoSpacer = newRectTransform.gameObject.AddComponent<REPOSpacer>();
+
+        newRectTransform.localPosition = localPosition;
+        newRectTransform.sizeDelta = size;
+        
+        return repoSpacer;
     }
     
     public static REPOPopupPage CreateREPOPopupPage(string headerText, REPOPopupPage.PresetSide presetSide, bool pageDimmerVisibility = false) => CreatePopupPage(headerText, pageDimmerVisibility, presetSide == REPOPopupPage.PresetSide.Left ? null : new Vector2(40, 0));
