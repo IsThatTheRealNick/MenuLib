@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using MenuLib.MonoBehaviors;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
 namespace MenuLib;
@@ -21,7 +20,7 @@ public static class MenuAPI
     public static void AddElementToMainMenu(BuilderDelegate builderDelegate) => mainMenuBuilderDelegates += builderDelegate;
     
     public static void AddElementToEscapeMenu(BuilderDelegate builderDelegate) => escapeMenuBuilderDelegates += builderDelegate;
-    
+
 #warning Might create custom versions of this
     public static void OpenPopup(string header, Color headerColor, string content, string buttonText, Action onClick) => MenuManager.instance.PagePopUp(header, headerColor, content, buttonText);
 
@@ -42,7 +41,7 @@ public static class MenuAPI
         MenuManager.instance.PagePopUpTwoOptions(menuButtonPopup, header, headerColor, content, leftButtonText, rightButtonText);
     }
 
-    public static REPOButton CreateREPOButton(string text, Action onClick, Transform parent, Vector2 localPosition = new())
+    public static REPOButton CreateREPOButton(string text, Action onClick, Transform parent, Vector2 localPosition = default)
     {
         var newRectTransform = Object.Instantiate(REPOTemplates.buttonTemplate, parent);
         newRectTransform.name = $"Menu Button - {text}";
@@ -59,7 +58,7 @@ public static class MenuAPI
         return repoButton;
     }
     
-    public static REPOToggle CreateREPOToggle(string text, Action<bool> onToggle, Transform parent, Vector2 localPosition = new(), string leftButtonText = "ON", string rightButtonText = "OFF", bool defaultValue = false)
+    public static REPOToggle CreateREPOToggle(string text, Action<bool> onToggle, Transform parent, Vector2 localPosition = default, string leftButtonText = "ON", string rightButtonText = "OFF", bool defaultValue = false)
     {
         var newRectTransform = Object.Instantiate(REPOTemplates.toggleTemplate, parent);
         newRectTransform.name = $"Menu Toggle - {text}";
