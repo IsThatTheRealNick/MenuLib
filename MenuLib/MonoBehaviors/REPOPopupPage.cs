@@ -77,7 +77,7 @@ public sealed class REPOPopupPage : MonoBehaviour
     public void AddElementToScrollView(BuilderDelegate builderDelegate)
     {
         var repoScrollViewElement = builderDelegate?.Invoke(menuScrollBox.scroller)?.gameObject.AddComponent<REPOScrollViewElement>();
-        
+
         if (repoScrollViewElement)
             repoScrollViewElement.onActiveStateChanged += scrollView.UpdateElements;
     }
@@ -128,9 +128,6 @@ public sealed class REPOPopupPage : MonoBehaviour
 
         scrollBarOutlineRectTransform.sizeDelta = scrollBarSize + new Vector2(4f, 4f);
         
-        REPOReflection.menuPage_ScrollBoxes.SetValue(menuPage, 0);
-        scrollBarRectTransform.gameObject.SetActive(false);
-        
         Destroy(GetComponent<MenuPageSettingsPage>());
         gameObject.AddComponent<MenuPageSettings>();
     }
@@ -139,5 +136,7 @@ public sealed class REPOPopupPage : MonoBehaviour
     {
         REPOReflection.menuScrollBox_scrollerEndPosition.SetValue(menuScrollBox, 0);
         menuScrollBox.scroller.localPosition = menuScrollBox.scroller.localPosition with { y = 0 };
+        
+        REPOReflection.menuPage_ScrollBoxes.SetValue(menuPage, 2);
     }
 }

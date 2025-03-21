@@ -9,10 +9,8 @@ internal sealed class REPOScrollView : MonoBehaviour
     
     public void UpdateElements()
     {
-        var maskSizeDeltaY = popupPage.maskRectTransform.sizeDelta.y;
-        
         var lastElementYPosition = 0f;
-        var yPosition = maskSizeDeltaY;
+        var yPosition = popupPage.maskRectTransform.sizeDelta.y;
         
         for (var i = 2; i < transform.childCount; i++)
         {
@@ -29,22 +27,13 @@ internal sealed class REPOScrollView : MonoBehaviour
 
             child.localPosition = localPosition;
         }
-
-        var scrollHeight = Math.Abs(lastElementYPosition);
-
-        var scrollBarGameObject = popupPage.scrollBarRectTransform.gameObject;
-        if (scrollHeight > maskSizeDeltaY && !scrollBarGameObject.activeSelf)
-        {
-            scrollBarGameObject.SetActive(true);
-            REPOReflection.menuPage_ScrollBoxes.SetValue(popupPage.menuPage, (int) REPOReflection.menuPage_ScrollBoxes.GetValue(popupPage.menuPage) + 1);
-        } else if (scrollHeight <= maskSizeDeltaY && scrollBarGameObject.activeSelf)
-        {
-            scrollBarGameObject.SetActive(false);
-            REPOReflection.menuPage_ScrollBoxes.SetValue(popupPage.menuPage, (int) REPOReflection.menuPage_ScrollBoxes.GetValue(popupPage.menuPage) - 1);
-        }
         
-        var minScroll = popupPage.menuScrollBox.scrollHandle.rect.height * .5f / popupPage.menuScrollBox.scrollBarBackground.rect.height * 1.1f;
-        REPOReflection.menuScrollBox_scrollerStartPosition.SetValue(popupPage.menuScrollBox, scrollHeight/(1f - minScroll));
+        popupPage.scrollBarRectTransform.gameObject.SetActive(lastElementYPosition < 0);
+
+        var menuScrollBox = popupPage.menuScrollBox;
+        
+        var divisor = 1f - menuScrollBox.scrollHandle.rect.height * .5f / menuScrollBox.scrollBarBackground.rect.height * 1.1f;
+        REPOReflection.menuScrollBox_scrollerStartPosition.SetValue(menuScrollBox, Math.Abs(lastElementYPosition/divisor));
     }
 
     private void Awake() => popupPage = GetComponentInParent<REPOPopupPage>();
