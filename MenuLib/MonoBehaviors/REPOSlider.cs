@@ -115,7 +115,6 @@ public sealed class REPOSlider : REPOElement
         SetValue(newValue, true);
     }
     
-    
     #warning add description text scroller
     private void Awake()
     {

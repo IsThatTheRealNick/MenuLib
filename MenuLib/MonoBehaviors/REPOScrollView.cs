@@ -23,7 +23,7 @@ internal sealed class REPOScrollView : MonoBehaviour
             
             var localPosition = scrollViewElement.rectTransform.localPosition;
             
-            yPosition -= scrollViewElement.rectTransform.rect.height * (1f - scrollViewElement.rectTransform.pivot.y);
+            yPosition -= scrollViewElement.overrideHeight ?? scrollViewElement.rectTransform.rect.height * (1f - scrollViewElement.rectTransform.pivot.y);
             localPosition.y = yPosition;
             lastElementYPosition = yPosition;
 
@@ -54,8 +54,11 @@ internal sealed class REPOScrollView : MonoBehaviour
 
         foreach (var scrollViewElement in scrollViewElements)
         {
+            if (!scrollViewElement.visibility)
+                continue;
+            
             var elementPosition = scrollViewElement.transform.position;
-            var isInRange = elementPosition.y <= maskRectTransform.position.y + maskRectTransform.sizeDelta.y && elementPosition.y >= maskRectTransform.position.y;
+            var isInRange = elementPosition.y <= maskRectTransform.position.y + maskRectTransform.sizeDelta.y + 50 && elementPosition.y >= maskRectTransform.position.y - 50;
 
             var elementGameObject = scrollViewElement.gameObject; 
             

@@ -76,19 +76,24 @@ public sealed class REPOPopupPage : REPOElement
         elementRectTransform.localPosition = localPosition;
     }
     
-    public void AddElementToScrollView(ScrollViewBuilderDelegate scrollViewBuilderDelegate)
+    public void AddElementToScrollView(ScrollViewBuilderDelegate scrollViewBuilderDelegate, float? overrideHeight = null)
     {
-        if (scrollViewBuilderDelegate?.Invoke(menuScrollBox.scroller)?.gameObject.AddComponent<REPOScrollViewElement>() is { } repoScrollViewElement)
-            repoScrollViewElement.onVisibilityChanged = scrollView.UpdateElements;
+        if (scrollViewBuilderDelegate?.Invoke(menuScrollBox.scroller)?.gameObject.AddComponent<REPOScrollViewElement>() is not { } scrollViewElement) return;
+        
+        scrollViewElement.onSettingChanged = scrollView.UpdateElements;
+        scrollViewElement.overrideHeight = overrideHeight;
     }
     
-    public void AddElementToScrollView(RectTransform elementRectTransform, Vector2 localPosition = default)
+    public void AddElementToScrollView(RectTransform elementRectTransform, Vector2 localPosition = default, float? overrideHeight = null)
     {
         elementRectTransform.SetParent(menuScrollBox.scroller);
         elementRectTransform.localPosition = localPosition;
 
-        if (elementRectTransform.gameObject.AddComponent<REPOScrollViewElement>() is { } repoScrollViewElement)
-            repoScrollViewElement.onVisibilityChanged = scrollView.UpdateElements;
+        if (elementRectTransform.gameObject.AddComponent<REPOScrollViewElement>() is not { } scrollViewElement)
+            return;
+        
+        scrollViewElement.onSettingChanged = scrollView.UpdateElements;
+        scrollViewElement.overrideHeight = overrideHeight;
     }
     
     private void Awake()
