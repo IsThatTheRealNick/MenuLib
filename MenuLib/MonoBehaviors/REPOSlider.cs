@@ -18,6 +18,8 @@ public sealed class REPOSlider : REPOElement
     
     public TextMeshProUGUI labelTMP, descriptionTMP;
 
+    public REPOTextScroller repoTextScroller;
+    
     public Action<float> onValueChanged;
 
     public BarBehavior barBehavior;
@@ -135,10 +137,13 @@ public sealed class REPOSlider : REPOElement
         
         labelTMP.rectTransform.localPosition -= movementShift;
 
-        descriptionTMP.alignment = TextAlignmentOptions.Left;
+        descriptionTMP.alignment = TextAlignmentOptions.Center;
         descriptionTMP.enableWordWrapping = descriptionTMP.enableAutoSizing = false;
         descriptionTMP.overflowMode = TextOverflowModes.Masking;
         descriptionTMP.fontSize -= 5;
+
+        repoTextScroller = descriptionTMP.gameObject.AddComponent<REPOTextScroller>();
+        repoTextScroller.textMeshPro = descriptionTMP;
 
         descriptionTMP.rectTransform.sizeDelta -= new Vector2(0, 4);
         descriptionTMP.rectTransform.localPosition -= movementShift;
@@ -239,7 +244,7 @@ public sealed class REPOSlider : REPOElement
 
         if (repoScrollViewElement)
         {
-            repoScrollViewElement.bottomPadding = hasDescription ? 25 : null;
+            repoScrollViewElement.bottomPadding = hasDescription ? 25f : 1f;
             repoScrollViewElement.onSettingChanged?.Invoke();
         }
         
