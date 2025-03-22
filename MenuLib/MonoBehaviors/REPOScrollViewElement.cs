@@ -6,15 +6,13 @@ namespace MenuLib.MonoBehaviors;
 public sealed class REPOScrollViewElement : MonoBehaviour
 {
     public RectTransform rectTransform;
-
-    public Action onSettingChanged;
-
-    public float? topPadding
+    
+    public float topPadding
     {
         get => _topPadding;
         set
         {
-            if (_topPadding.HasValue && value.HasValue && Math.Abs(_topPadding.Value - value.Value) < float.Epsilon)
+            if (Math.Abs(_topPadding - value) < float.Epsilon)
                 return;
             
             onSettingChanged?.Invoke();
@@ -22,12 +20,12 @@ public sealed class REPOScrollViewElement : MonoBehaviour
             _topPadding = value;
         }
     }
-    public float? bottomPadding
+    public float bottomPadding
     {
         get => _bottomPadding;
         set
         {
-            if (_bottomPadding.HasValue && value.HasValue && Math.Abs(_bottomPadding.Value - value.Value) < float.Epsilon)
+            if (Math.Abs(_bottomPadding - value) < float.Epsilon)
                 return;
             
             onSettingChanged?.Invoke();
@@ -50,8 +48,10 @@ public sealed class REPOScrollViewElement : MonoBehaviour
         }
     }
 
+    internal Action onSettingChanged;
+    
     private bool _visibility = true;
-    private float? _topPadding, _bottomPadding;
+    private float _topPadding, _bottomPadding;
     
     private void Awake() => rectTransform = transform as RectTransform;
 }

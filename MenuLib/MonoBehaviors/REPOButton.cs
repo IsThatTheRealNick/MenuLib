@@ -13,7 +13,7 @@ public sealed class REPOButton : REPOElement
 
     private string currentText;
     
-    public Vector2 GetLabelSize() => labelTMP.GetPreferredValues();
+    public Vector2 GetLabelSize() => labelTMP.GetPreferredValues(); 
     
     private void Awake()
     {
@@ -31,11 +31,9 @@ public sealed class REPOButton : REPOElement
         if (labelTMP.text == currentText)
             return;
 
-        rectTransform.sizeDelta = GetPreferredTextSize();
+        rectTransform.sizeDelta = GetLabelSize();
         currentText = labelTMP.text;
     }
     
-    public Vector2 GetPreferredTextSize() => labelTMP.GetPreferredValues(); 
-
     private void OnTransformParentChanged() => REPOReflection.menuButton_ParentPage.SetValue(menuButton, GetComponentInParent<MenuPage>());
 }

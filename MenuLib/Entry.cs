@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace MenuLib
 {
-    [BepInPlugin("nickklmao.menulib", MOD_NAME, "1.0.5")]
+    [BepInPlugin("nickklmao.menulib", MOD_NAME, "2.0.0")]
     internal sealed class Entry : BaseUnityPlugin
     {
         private const string MOD_NAME = "Menu Lib";
