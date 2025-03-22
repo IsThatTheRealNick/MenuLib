@@ -239,7 +239,7 @@ public sealed class REPOSlider : REPOElement
 
         if (repoScrollViewElement)
         {
-            repoScrollViewElement.bottomPadding = hasDescription ? 24 : null;
+            repoScrollViewElement.bottomPadding = hasDescription ? 25 : null;
             repoScrollViewElement.onSettingChanged?.Invoke();
         }
         
