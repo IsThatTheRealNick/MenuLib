@@ -31,15 +31,23 @@ public sealed class REPOSlider : REPOElement
     }
     public float max
     {
-        get => stringOptions?.Length > 0 ? stringOptions.Length : _max;
+        get => stringOptions?.Length > 0 ? stringOptions.Length - 1 : _max;
         set => _max = value;
     }
 
     public string prefix, postfix;
 
-    public string[] stringOptions = [];
-    
-    public float precision
+    public string[] stringOptions
+    {
+        get => _stringOptions;
+        set
+        {
+            _stringOptions = value;
+            UpdateBarText();
+        }
+    }
+
+    public int precision
     {
         get => stringOptions?.Length > 0 ? 0 : _precision;
         set
@@ -63,7 +71,9 @@ public sealed class REPOSlider : REPOElement
 
     private float normalizedValue => (value - min) / (max - min);
     private float _min, _max = 1;
-    private float previousValue, _precision = 2, _precisionDecimal = .01f;
+    private float previousValue, _precisionDecimal = .01f;
+    private int _precision = 2;
+    private string[] _stringOptions = [];
     private bool isHovering;
 
     private bool hasValueChanged => Math.Abs(value - previousValue) > float.Epsilon;
@@ -105,6 +115,8 @@ public sealed class REPOSlider : REPOElement
         SetValue(newValue, true);
     }
     
+    
+    #warning add description text scroller
     private void Awake()
     {
         rectTransform = transform as RectTransform;
@@ -235,13 +247,13 @@ public sealed class REPOSlider : REPOElement
             BarBehavior.StaticAtMaximum => 1,
             _ => throw new ArgumentOutOfRangeException()
         };
-
-        barMaskRectTransform.sizeDelta = new Vector2(newNormalizedBarValue * 100, 10);
+        
+        barRectTransform.sizeDelta = barMaskRectTransform.sizeDelta = new Vector2(newNormalizedBarValue * 100, 10);
     }
 
     private void UpdateBarText()
     {
-        var valueToDisplay = normalizedValue;
+        var valueToDisplay = value;
 
         prefix ??= string.Empty;
         postfix ??= string.Empty;
@@ -249,7 +261,7 @@ public sealed class REPOSlider : REPOElement
         var barText = prefix;
         
         if (stringOptions?.Length > 0)
-            barText += stringOptions.ElementAtOrDefault(Convert.ToInt32(normalizedValue)) ?? stringOptions.First();
+            barText += stringOptions.ElementAtOrDefault(Convert.ToInt32(valueToDisplay)) ?? stringOptions.First();
         else 
             barText += valueToDisplay.ToString($"F{precision}", CultureInfo.CurrentCulture);
 
