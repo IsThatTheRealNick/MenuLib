@@ -9,17 +9,30 @@ public sealed class REPOScrollViewElement : MonoBehaviour
 
     public Action onSettingChanged;
 
-    public float? overrideHeight
+    public float? topPadding
     {
-        get => _overrideHeight;
+        get => _topPadding;
         set
         {
-            if (_overrideHeight.HasValue && value.HasValue && Math.Abs(_overrideHeight.Value - value.Value) < float.Epsilon)
+            if (_topPadding.HasValue && value.HasValue && Math.Abs(_topPadding.Value - value.Value) < float.Epsilon)
                 return;
             
             onSettingChanged?.Invoke();
             
-            _overrideHeight = value;
+            _topPadding = value;
+        }
+    }
+    public float? bottomPadding
+    {
+        get => _bottomPadding;
+        set
+        {
+            if (_bottomPadding.HasValue && value.HasValue && Math.Abs(_bottomPadding.Value - value.Value) < float.Epsilon)
+                return;
+            
+            onSettingChanged?.Invoke();
+            
+            _bottomPadding = value;
         }
     }
     
@@ -38,7 +51,7 @@ public sealed class REPOScrollViewElement : MonoBehaviour
     }
 
     private bool _visibility = true;
-    private float? _overrideHeight;
+    private float? _topPadding, _bottomPadding;
     
     private void Awake() => rectTransform = transform as RectTransform;
 }

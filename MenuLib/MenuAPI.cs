@@ -88,7 +88,7 @@ public static class MenuAPI
         var repoSlider = newRectTransform.gameObject.AddComponent<REPOSlider>();
 
         repoSlider.labelTMP.text = text;
-        repoSlider.descriptionTMP.text = description; //Add text scroller
+        repoSlider.descriptionTMP.text = description;
         repoSlider.onValueChanged = onValueChanged;
         repoSlider.min = min;
         repoSlider.max = max;
@@ -111,7 +111,7 @@ public static class MenuAPI
         var repoSlider = newRectTransform.gameObject.AddComponent<REPOSlider>();
 
         repoSlider.labelTMP.text = text;
-        repoSlider.descriptionTMP.text = description; //Add text scroller
+        repoSlider.descriptionTMP.text = description;
         repoSlider.onValueChanged = f => onValueChanged.Invoke(Convert.ToInt32(f));
         repoSlider.min = min;
         repoSlider.max = max;
@@ -204,9 +204,9 @@ public static class MenuAPI
         return repoSpacer;
     }
     
-    public static REPOPopupPage CreateREPOPopupPage(string headerText, REPOPopupPage.PresetSide presetSide, bool pageDimmerVisibility = false) => CreatePopupPage(headerText, pageDimmerVisibility, presetSide == REPOPopupPage.PresetSide.Left ? null : new Vector2(40, 0));
+    public static REPOPopupPage CreateREPOPopupPage(string headerText, REPOPopupPage.PresetSide presetSide, bool pageDimmerVisibility = false, float spacing = 0) => CreateREPOPopupPage(headerText, pageDimmerVisibility, spacing, presetSide == REPOPopupPage.PresetSide.Left ? null : new Vector2(40, 0));
     
-    public static REPOPopupPage CreatePopupPage(string headerText, bool pageDimmerVisibility = false, Vector2? localPosition = null)
+    public static REPOPopupPage CreateREPOPopupPage(string headerText, bool pageDimmerVisibility = false, float spacing = 0, Vector2? localPosition = null)
     {
         var newRectTransform = Object.Instantiate(REPOTemplates.popupPageTemplate, MenuHolder.instance.transform);
         newRectTransform.name = $"Menu Page {headerText}";
@@ -216,6 +216,8 @@ public static class MenuAPI
         repoPopupPage.rectTransform.localPosition = localPosition ?? new Vector2(-280, 0);
         repoPopupPage.pageDimmerVisibility = pageDimmerVisibility;
         repoPopupPage.headerTMP.text = headerText;
+
+        repoPopupPage.scrollView.spacing = spacing;
         
         return repoPopupPage;
     }

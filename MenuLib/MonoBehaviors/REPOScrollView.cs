@@ -3,9 +3,11 @@ using UnityEngine;
 
 namespace MenuLib.MonoBehaviors;
 
-internal sealed class REPOScrollView : MonoBehaviour
+public sealed class REPOScrollView : MonoBehaviour
 {
-    internal REPOPopupPage popupPage;
+    public REPOPopupPage popupPage;
+
+    public float spacing;
 
     private REPOScrollViewElement[] scrollViewElements = [];
     
@@ -22,10 +24,17 @@ internal sealed class REPOScrollView : MonoBehaviour
                 continue;
             
             var localPosition = scrollViewElement.rectTransform.localPosition;
+
+            if (scrollViewElement.topPadding is { } topPadding)
+                yPosition -= topPadding;
             
-            yPosition -= scrollViewElement.overrideHeight ?? scrollViewElement.rectTransform.rect.height * (1f - scrollViewElement.rectTransform.pivot.y);
-            localPosition.y = yPosition;
-            lastElementYPosition = yPosition;
+            yPosition -= scrollViewElement.rectTransform.rect.height;
+            lastElementYPosition = localPosition.y = yPosition;
+            
+            if (scrollViewElement.bottomPadding is { } bottomPadding)
+                yPosition -= bottomPadding;
+
+            yPosition -= spacing;
 
             scrollViewElement.rectTransform.localPosition = localPosition;
         }

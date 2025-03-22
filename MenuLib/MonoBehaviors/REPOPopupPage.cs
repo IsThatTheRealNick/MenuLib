@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MenuLib.MonoBehaviors;
 
-public sealed class REPOPopupPage : REPOElement
+public sealed class REPOPopupPage : MonoBehaviour
 {
     public enum PresetSide
     {
@@ -13,11 +13,13 @@ public sealed class REPOPopupPage : REPOElement
     }
  
     public delegate RectTransform ScrollViewBuilderDelegate(Transform scrollView);
-    
+
+    public RectTransform rectTransform;
     public RectTransform maskRectTransform, scrollBarRectTransform;
     public MenuPage menuPage;
     public TextMeshProUGUI headerTMP;
     public MenuScrollBox menuScrollBox;
+    public REPOScrollView scrollView;
     
     public bool pageDimmerVisibility
     {
@@ -50,7 +52,6 @@ public sealed class REPOPopupPage : REPOElement
     }
     
     private GameObject pageDimmerGameObject;
-    private REPOScrollView scrollView;
 
     private Vector2 defaultMaskSizeDelta, defaultMaskPosition;
     private Padding _maskPadding;
@@ -76,15 +77,16 @@ public sealed class REPOPopupPage : REPOElement
         elementRectTransform.localPosition = localPosition;
     }
     
-    public void AddElementToScrollView(ScrollViewBuilderDelegate scrollViewBuilderDelegate, float? overrideHeight = null)
+    public void AddElementToScrollView(ScrollViewBuilderDelegate scrollViewBuilderDelegate, float? topPadding = null, float? bottomPadding = null)
     {
         if (scrollViewBuilderDelegate?.Invoke(menuScrollBox.scroller)?.gameObject.AddComponent<REPOScrollViewElement>() is not { } scrollViewElement) return;
         
         scrollViewElement.onSettingChanged = scrollView.UpdateElements;
-        scrollViewElement.overrideHeight = overrideHeight;
+        scrollViewElement.topPadding = topPadding;
+        scrollViewElement.bottomPadding = bottomPadding;
     }
     
-    public void AddElementToScrollView(RectTransform elementRectTransform, Vector2 localPosition = default, float? overrideHeight = null)
+    public void AddElementToScrollView(RectTransform elementRectTransform, Vector2 localPosition = default, float? topPadding = null, float? bottomPadding = null)
     {
         elementRectTransform.SetParent(menuScrollBox.scroller);
         elementRectTransform.localPosition = localPosition;
@@ -93,7 +95,8 @@ public sealed class REPOPopupPage : REPOElement
             return;
         
         scrollViewElement.onSettingChanged = scrollView.UpdateElements;
-        scrollViewElement.overrideHeight = overrideHeight;
+        scrollViewElement.topPadding = topPadding;
+        scrollViewElement.bottomPadding = bottomPadding;
     }
     
     private void Awake()

@@ -36,7 +36,7 @@ public sealed class REPOSlider : REPOElement
     }
 
     public string prefix, postfix;
-
+    
     public string[] stringOptions
     {
         get => _stringOptions;
@@ -64,6 +64,8 @@ public sealed class REPOSlider : REPOElement
     }
     
     private RectTransform barRectTransform, barSizeRectTransform, barPointerRectTransform, barMaskRectTransform;
+    private RectTransform sliderBackgroundRectTransform, backgroundFillRectTransform, backgroundOutlineRectTransform;
+    
     private TextMeshProUGUI valueTMP, maskedValueTMP;
     
     private MenuPage menuPage;
@@ -74,6 +76,7 @@ public sealed class REPOSlider : REPOElement
     private float previousValue, _precisionDecimal = .01f;
     private int _precision = 2;
     private string[] _stringOptions = [];
+    private string currentDescription;
     private bool isHovering;
 
     private bool hasValueChanged => Math.Abs(value - previousValue) > float.Epsilon;
@@ -115,10 +118,10 @@ public sealed class REPOSlider : REPOElement
         SetValue(newValue, true);
     }
     
-    #warning add description text scroller
+#warning add description text scroller
     private void Awake()
     {
-        rectTransform = transform as RectTransform;
+        rectTransform = (RectTransform) transform;
         menuPage = GetComponentInParent<MenuPage>();
         menuSelectableElement = GetComponent<MenuSelectableElement>();
         labelTMP = GetComponentInChildren<TextMeshProUGUI>();
@@ -127,10 +130,10 @@ public sealed class REPOSlider : REPOElement
         barMaskRectTransform = (RectTransform) transform.Find("MaskedText"); 
         maskedValueTMP = barMaskRectTransform.GetComponentInChildren<TextMeshProUGUI>();
         barPointerRectTransform = (RectTransform) transform.Find("Bar Pointer").transform;
-
-        var horizontalShift = Vector3.right * 5.3f;
         
-        labelTMP.rectTransform.localPosition -= horizontalShift;
+        var movementShift = new Vector3(5.3f, 0);
+        
+        labelTMP.rectTransform.localPosition -= movementShift;
 
         descriptionTMP.alignment = TextAlignmentOptions.Left;
         descriptionTMP.enableWordWrapping = descriptionTMP.enableAutoSizing = false;
@@ -138,21 +141,26 @@ public sealed class REPOSlider : REPOElement
         descriptionTMP.fontSize -= 5;
 
         descriptionTMP.rectTransform.sizeDelta -= new Vector2(0, 4);
+        descriptionTMP.rectTransform.localPosition -= movementShift;
 
-        transform.Find("SliderBG").localPosition -= horizontalShift;
+        sliderBackgroundRectTransform = (RectTransform) transform.Find("SliderBG");
+        backgroundFillRectTransform = (RectTransform) sliderBackgroundRectTransform.Find("RawImage (2)");
+        backgroundOutlineRectTransform = (RectTransform) sliderBackgroundRectTransform.Find("RawImage (3)");
+        
+        sliderBackgroundRectTransform.localPosition -= movementShift;
 
-        valueTMP.rectTransform.localPosition -= horizontalShift;
-        maskedValueTMP.rectTransform.parent.localPosition -= horizontalShift;
+        valueTMP.rectTransform.localPosition -= movementShift;
+        maskedValueTMP.rectTransform.parent.localPosition -= movementShift;
         
         var bar = transform.Find("Bar");
-        bar.localPosition -= horizontalShift;
+        bar.localPosition -= movementShift;
         
         barRectTransform = (RectTransform) bar.Find("RawImage");
         barRectTransform.pivot = Vector2.zero;
         barRectTransform.localPosition = new Vector2(0f, -5f);
 
         barSizeRectTransform = (RectTransform) transform.Find("BarSize");
-        barSizeRectTransform.localPosition -= horizontalShift;
+        barSizeRectTransform.localPosition -= movementShift;
         
         var labelSizeDelta = labelTMP.rectTransform.sizeDelta;
         labelSizeDelta.y -= 10;
@@ -161,15 +169,17 @@ public sealed class REPOSlider : REPOElement
         var buttons = GetComponentsInChildren<Button>();
 
         var decrementButton = buttons[0];
-        decrementButton.transform.localPosition -= horizontalShift;
+        decrementButton.transform.localPosition -= movementShift;
         decrementButton.onClick = new Button.ButtonClickedEvent();
         decrementButton.onClick.AddListener(Decrement);
         
         var incrementButton = buttons[1];
-        incrementButton.transform.localPosition -= horizontalShift;
+        incrementButton.transform.localPosition -= movementShift;
         incrementButton.onClick = new Button.ButtonClickedEvent();
         incrementButton.onClick.AddListener(Increment);
         
+        Destroy(sliderBackgroundRectTransform.Find("RawImage (4)").gameObject);
+        Destroy(sliderBackgroundRectTransform.Find("RawImage (5)").gameObject);
         Destroy(bar.Find("Extra Bar").gameObject);
         Destroy(GetComponent<MenuSliderMicrophone>());
         Destroy(GetComponent<MenuSlider>());
@@ -177,6 +187,8 @@ public sealed class REPOSlider : REPOElement
 
     private void Update()
     {
+        HandleDescription();
+        
         var isHoveringUI = SemiFunc.UIMouseHover(menuPage, barSizeRectTransform, REPOReflection.menuSelectableElement_menuID.GetValue(menuSelectableElement) as string, 5f, 5f);
 
         if (isHoveringUI)
@@ -213,6 +225,25 @@ public sealed class REPOSlider : REPOElement
         UpdateBarText();
         
         onValueChanged.Invoke(previousValue = value);
+    }
+    
+    private void HandleDescription()
+    {
+        if (descriptionTMP.text == currentDescription)
+            return;
+
+        var hasDescription = !string.IsNullOrEmpty(descriptionTMP.text);
+        
+        backgroundFillRectTransform.sizeDelta = new Vector2(109.8f, hasDescription ? 33 : 15f);
+        backgroundOutlineRectTransform.sizeDelta = new Vector2(108, hasDescription ? 30.6f : 15f);
+
+        if (repoScrollViewElement)
+        {
+            repoScrollViewElement.bottomPadding = hasDescription ? 24 : null;
+            repoScrollViewElement.onSettingChanged?.Invoke();
+        }
+        
+        currentDescription = descriptionTMP.text;
     }
     
     private void HandleHovering()
