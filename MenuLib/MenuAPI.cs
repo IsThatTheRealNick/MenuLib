@@ -77,7 +77,7 @@ public static class MenuAPI
         return repoToggle;
     }
     
-    public static REPOSlider CreateREPOSlider(string text, string description, Action<float> onValueChanged, Transform parent, Vector2 localPosition = default, float min = 0f, float max = 1f, float precision = 2f, float defaultValue = 0f, REPOSlider.BarDirection barDirection = REPOSlider.BarDirection.Horizontal, REPOSlider.BarBehavior barBehavior = REPOSlider.BarBehavior.UpdateWithValue)
+    public static REPOSlider CreateREPOSlider(string text, string description, Action<float> onValueChanged, Transform parent, Vector2 localPosition = default, float min = 0f, float max = 1f, float precision = 2f, float defaultValue = 0f, string prefix = "", string postfix = "", REPOSlider.BarBehavior barBehavior = REPOSlider.BarBehavior.UpdateWithValue)
     {
         var newRectTransform = Object.Instantiate(REPOTemplates.sliderTemplate, parent);
         newRectTransform.name = $"Float Slider - {text}";
@@ -92,17 +92,18 @@ public static class MenuAPI
         repoSlider.min = min;
         repoSlider.max = max;
         repoSlider.precision = precision;
-        repoSlider.barDirection = barDirection;
+        repoSlider.prefix = prefix;
+        repoSlider.postfix = postfix;
         repoSlider.barBehavior = barBehavior;
         
         repoSlider.SetValue(defaultValue, false);
         return repoSlider;
     }
     
-    public static REPOSlider CreateREPOSlider(string text, string description, Action<int> onValueChanged, Transform parent, Vector2 localPosition = default, int min = 0, int max = 1, int defaultValue = 0, REPOSlider.BarDirection barDirection = REPOSlider.BarDirection.Horizontal, REPOSlider.BarBehavior barBehavior = REPOSlider.BarBehavior.UpdateWithValue)
+    public static REPOSlider CreateREPOSlider(string text, string description, Action<int> onValueChanged, Transform parent, Vector2 localPosition = default, int min = 0, int max = 1, int defaultValue = 0, string prefix = "", string postfix = "", REPOSlider.BarBehavior barBehavior = REPOSlider.BarBehavior.UpdateWithValue)
     {
         var newRectTransform = Object.Instantiate(REPOTemplates.sliderTemplate, parent);
-        newRectTransform.name = $"Float Slider - {text}";
+        newRectTransform.name = $"Int Slider - {text}";
 
         newRectTransform.localPosition = localPosition;
         
@@ -114,7 +115,8 @@ public static class MenuAPI
         repoSlider.min = min;
         repoSlider.max = max;
         repoSlider.precision = 0;
-        repoSlider.barDirection = barDirection;
+        repoSlider.prefix = prefix;
+        repoSlider.postfix = postfix;
         repoSlider.barBehavior = barBehavior;
         
         repoSlider.SetValue(defaultValue, false);

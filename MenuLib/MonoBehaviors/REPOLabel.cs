@@ -1,12 +1,10 @@
-﻿using MenuLib.Interfaces;
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 
 namespace MenuLib.MonoBehaviors;
 
-public sealed class REPOLabel : MonoBehaviour, IREPOElement
+public sealed class REPOLabel : REPOElement
 {
-    public RectTransform rectTransform { get; private set; }
     public TextMeshProUGUI labelTMP;
     
     private void Awake()

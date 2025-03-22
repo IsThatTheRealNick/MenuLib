@@ -1,11 +1,10 @@
-﻿using MenuLib.Interfaces;
-using MenuLib.Structs;
+﻿using MenuLib.Structs;
 using TMPro;
 using UnityEngine;
 
 namespace MenuLib.MonoBehaviors;
 
-public sealed class REPOPopupPage : MonoBehaviour, IREPOElement
+public sealed class REPOPopupPage : REPOElement
 {
     public enum PresetSide
     {
@@ -14,8 +13,7 @@ public sealed class REPOPopupPage : MonoBehaviour, IREPOElement
     }
  
     public delegate RectTransform ScrollViewBuilderDelegate(Transform scrollView);
- 
-    public RectTransform rectTransform { get; private set; }
+    
     public RectTransform maskRectTransform, scrollBarRectTransform;
     public MenuPage menuPage;
     public TextMeshProUGUI headerTMP;

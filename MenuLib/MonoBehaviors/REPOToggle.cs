@@ -1,16 +1,15 @@
 ﻿using System;
-using MenuLib.Interfaces;
+using MenuLib.MonoBehaviors;
 using TMPro;
 using UnityEngine;
 using Button = UnityEngine.UI.Button;
 
 namespace MenuLib.MonoBehaviors;
 
-public sealed class REPOToggle : MonoBehaviour, IREPOElement
+public sealed class REPOToggle : REPOElement
 {
     private static readonly Vector3 leftPosition = new(137.8f, 12.3f), leftScale = new(73f, 22f, 1f), rightPosition = new(212.644f, 12.3f), rightScale = new(74f, 22f, 1f);
-
-    public RectTransform rectTransform { get; private set; }
+    
     public TextMeshProUGUI labelTMP, leftButtonTMP, rightButtonTMP;
 
     public Action<bool> onToggle;

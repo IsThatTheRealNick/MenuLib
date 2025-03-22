@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Globalization;
-using MenuLib.Interfaces;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace MenuLib.MonoBehaviors;
 
-public sealed class REPOSlider : MonoBehaviour, IREPOElement
+public sealed class REPOSlider : REPOElement
 {
     public enum BarBehavior
     {
@@ -16,33 +16,43 @@ public sealed class REPOSlider : MonoBehaviour, IREPOElement
         StaticAtMaximum
     }
     
-    public enum BarDirection
-    {
-        Horizontal,
-        Vertical
-    }
-
-    private static readonly Vector2 menuSelectionBoxCustomOffset = new(-3f, 0f), menuSelectionBoxCustomScale = new(20f, 10f);
-    
-    public RectTransform rectTransform { get; private set; }
-    
     public TextMeshProUGUI labelTMP, descriptionTMP;
 
     public Action<float> onValueChanged;
 
     public BarBehavior barBehavior;
-    public BarDirection barDirection;
 
-    public float value, min, max = 1;
+    public float value;
 
+    public float min
+    {
+        get => stringOptions?.Length > 0 ? 0 : _min;
+        set => _min = value;
+    }
+    public float max
+    {
+        get => stringOptions?.Length > 0 ? stringOptions.Length : _max;
+        set => _max = value;
+    }
+
+    public string prefix, postfix;
+
+    public string[] stringOptions = [];
+    
     public float precision
     {
-        get => _precision;
+        get => stringOptions?.Length > 0 ? 0 : _precision;
         set
         {
             precisionDecimal = value == 0 ? 1 : Mathf.Pow(10, -value);
             _precision = value;
         }
+    }
+
+    public float precisionDecimal
+    {
+        get => stringOptions?.Length > 0 ? 1 : _precisionDecimal;
+        set => _precisionDecimal = value;
     }
     
     private RectTransform barRectTransform, barSizeRectTransform, barPointerRectTransform, barMaskRectTransform;
@@ -52,7 +62,8 @@ public sealed class REPOSlider : MonoBehaviour, IREPOElement
     private MenuSelectableElement menuSelectableElement;
 
     private float normalizedValue => (value - min) / (max - min);
-    private float previousValue, _precision = 2, precisionDecimal = .01f;
+    private float _min, _max = 1;
+    private float previousValue, _precision = 2, _precisionDecimal = .01f;
     private bool isHovering;
 
     private bool hasValueChanged => Math.Abs(value - previousValue) > float.Epsilon;
@@ -164,7 +175,7 @@ public sealed class REPOSlider : MonoBehaviour, IREPOElement
             
             isHovering = true;
             
-            SemiFunc.MenuSelectionBoxTargetSet(menuPage, barSizeRectTransform, menuSelectionBoxCustomOffset, menuSelectionBoxCustomScale);
+            SemiFunc.MenuSelectionBoxTargetSet(menuPage, barSizeRectTransform, new Vector2(-3f, 0f), new Vector2(20f, 10f));
             
             if (!barPointerRectTransform.gameObject.activeSelf)
                 barPointerRectTransform.gameObject.SetActive(true);
@@ -192,7 +203,7 @@ public sealed class REPOSlider : MonoBehaviour, IREPOElement
         
         onValueChanged.Invoke(previousValue = value);
     }
-
+    
     private void HandleHovering()
     {
         var pointInRect = SemiFunc.UIMouseGetLocalPositionWithinRectTransform(barSizeRectTransform).x;
@@ -225,18 +236,23 @@ public sealed class REPOSlider : MonoBehaviour, IREPOElement
             _ => throw new ArgumentOutOfRangeException()
         };
 
-        barMaskRectTransform.sizeDelta = barRectTransform.sizeDelta = barDirection switch
-        {
-            BarDirection.Horizontal => new Vector2(newNormalizedBarValue * 100, 10),
-            BarDirection.Vertical => new Vector2(100, newNormalizedBarValue * 10),
-            _ => throw new ArgumentOutOfRangeException()
-        };
+        barMaskRectTransform.sizeDelta = new Vector2(newNormalizedBarValue * 100, 10);
     }
 
     private void UpdateBarText()
     {
-        var tempValue = normalizedValue;
+        var valueToDisplay = normalizedValue;
+
+        prefix ??= string.Empty;
+        postfix ??= string.Empty;
+
+        var barText = prefix;
         
-        maskedValueTMP.text = valueTMP.text = tempValue.ToString($"F{precision}", CultureInfo.CurrentCulture);
+        if (stringOptions?.Length > 0)
+            barText += stringOptions.ElementAtOrDefault(Convert.ToInt32(normalizedValue)) ?? stringOptions.First();
+        else 
+            barText += valueToDisplay.ToString($"F{precision}", CultureInfo.CurrentCulture);
+
+        maskedValueTMP.text = valueTMP.text = barText + postfix;
     }
 }

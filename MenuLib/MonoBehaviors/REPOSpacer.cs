@@ -1,12 +1,9 @@
-﻿using MenuLib.Interfaces;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MenuLib.MonoBehaviors;
 
-public sealed class REPOSpacer : MonoBehaviour, IREPOElement
+public sealed class REPOSpacer : REPOElement
 {
-    public RectTransform rectTransform { get; private set; }
-
     private void Awake()
     {
         rectTransform = (RectTransform) transform;

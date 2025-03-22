@@ -1,14 +1,11 @@
-﻿using MenuLib.Interfaces;
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace MenuLib.MonoBehaviors;
 
-public sealed class REPOButton : MonoBehaviour, IREPOElement
+public sealed class REPOButton : REPOElement
 {
-    public RectTransform rectTransform { get; private set; }
-    
     public Button button;
     public MenuButton menuButton;
 

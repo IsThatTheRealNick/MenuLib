@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MenuLib.MonoBehaviors;
 
-internal sealed class REPOScrollViewElement : MonoBehaviour
+public sealed class REPOScrollViewElement : MonoBehaviour
 {
     public RectTransform rectTransform;
 
