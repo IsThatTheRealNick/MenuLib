@@ -47,11 +47,15 @@ public sealed class REPOPopupPage : MonoBehaviour
             maskRectTransform.sizeDelta = sizeDelta;
             maskRectTransform.localPosition = position;
             
+            UpdateScrollBarPosition();
+            
             _maskPadding = value;
         }
     }
     
     private GameObject pageDimmerGameObject;
+
+    private RectTransform scrollBarFillRectTransform, scrollBarOutlineRectTransform;
 
     private Vector2 defaultMaskSizeDelta, defaultMaskPosition;
     private Padding _maskPadding;
@@ -129,29 +133,34 @@ public sealed class REPOPopupPage : MonoBehaviour
 
         defaultMaskSizeDelta = maskRectTransform.sizeDelta;
         defaultMaskPosition = maskRectTransform.localPosition;
-
-        maskPadding = new Padding(0, 0, 0, 25);
+       
 
         menuScrollBox.scroller.sizeDelta = maskRectTransform.sizeDelta;
         
         scrollBarRectTransform = (RectTransform) menuScrollBox.scrollBar.transform;
-        var scrollBarFillRectTransform = (RectTransform) scrollBarRectTransform.Find("Scroll Bar Bg (2)");
-        var scrollBarOutlineRectTransform = (RectTransform) scrollBarRectTransform.Find("Scroll Bar Bg (1)");
+        scrollBarFillRectTransform = (RectTransform) scrollBarRectTransform.Find("Scroll Bar Bg (2)");
+        scrollBarOutlineRectTransform = (RectTransform) scrollBarRectTransform.Find("Scroll Bar Bg (1)");
+
+        maskPadding = new Padding(0, 0, 0, 25);
         
-        var mainScrollBarPosition = scrollBarRectTransform.localPosition;
-        mainScrollBarPosition.y = maskRectTransform.localPosition.y;
-        scrollBarRectTransform.localPosition = mainScrollBarPosition;
+        Destroy(GetComponent<MenuPageSettingsPage>());
+        gameObject.AddComponent<MenuPageSettings>();
+    }
+
+    private void UpdateScrollBarPosition()
+    {
+        if (!scrollBarRectTransform)
+            return;
+        
+        scrollBarRectTransform.localPosition = scrollBarRectTransform.localPosition with { y = maskRectTransform.localPosition.y};
 
         var scrollBarSize = scrollBarRectTransform.sizeDelta;
         scrollBarSize.y = maskRectTransform.sizeDelta.y;
         menuScrollBox.scrollBarBackground.sizeDelta = scrollBarFillRectTransform.sizeDelta = scrollBarRectTransform.sizeDelta = scrollBarSize;
 
         scrollBarOutlineRectTransform.sizeDelta = scrollBarSize + new Vector2(4f, 4f);
-        
-        Destroy(GetComponent<MenuPageSettingsPage>());
-        gameObject.AddComponent<MenuPageSettings>();
     }
-
+    
     private void Start()
     {
         REPOReflection.menuScrollBox_scrollerEndPosition.SetValue(menuScrollBox, 0);
