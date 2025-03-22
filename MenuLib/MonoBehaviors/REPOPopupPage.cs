@@ -62,13 +62,11 @@ public sealed class REPOPopupPage : MonoBehaviour, IREPOElement
     public void ClosePage(bool closePagesAddedOnTop)
     {
         if (closePagesAddedOnTop)
-            MenuManager.instance.PageCloseAllAddedOnTop();
+            MenuAPI.CloseAllPagesAddedOnTop();
         
         menuPage.PageStateSet(MenuPage.PageState.Closing);
-
-        var parentPage = REPOReflection.menuPage_PageUnderThisPage.GetValue(menuPage) as MenuPage;
         
-        if (parentPage)
+        if (REPOReflection.menuPage_PageUnderThisPage.GetValue(menuPage) is MenuPage parentPage)
             MenuManager.instance.PageSetCurrent(parentPage.menuPageIndex, parentPage);
     }
     

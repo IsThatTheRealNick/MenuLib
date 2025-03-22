@@ -24,10 +24,7 @@ public static class MenuAPI
 
     public static void CloseAllPagesAddedOnTop() => MenuManager.instance.PageCloseAllAddedOnTop();
     
-#warning Might create custom versions of this
-    public static void OpenPopup(string header, Color headerColor, string content, string buttonText, Action onClick) => MenuManager.instance.PagePopUp(header, headerColor, content, buttonText);
-
-    public static void OpenPopup(string header, Color headerColor, string content, string leftButtonText, Action onLeftClicked, string rightButtonText, Action onRightClicked = null)
+    public static void OpenPopup(string header, Color headerColor, string content, Action onLeftClicked, Action onRightClicked = null)
     {
         if (!menuButtonPopup)
             menuButtonPopup = MenuManager.instance.gameObject.AddComponent<MenuButtonPopUp>();
@@ -41,7 +38,8 @@ public static class MenuAPI
         if (onRightClicked != null)
             menuButtonPopup.option2Event.AddListener(new UnityAction(onRightClicked));
         
-        MenuManager.instance.PagePopUpTwoOptions(menuButtonPopup, header, headerColor, content, leftButtonText, rightButtonText);
+        //Setting the text in here doesn't work
+        MenuManager.instance.PagePopUpTwoOptions(menuButtonPopup, header, headerColor, content, "Yes", "No");
     }
     
     public static REPOButton CreateREPOButton(string text, Action onClick, Transform parent, Vector2 localPosition = default)

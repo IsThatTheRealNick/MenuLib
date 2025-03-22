@@ -44,7 +44,7 @@ public sealed class REPOToggle : MonoBehaviour, IREPOElement
         background.localPosition = backgroundLocalPosition;
 
         var labelSizeDelta = labelTMP.rectTransform.sizeDelta;
-        labelSizeDelta.x -= 4;
+        labelSizeDelta.y -= 4;
         labelTMP.rectTransform.sizeDelta = labelSizeDelta;
         
         var labelLocalPosition = labelTMP.rectTransform.localPosition;
