@@ -1,52 +1,31 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using MenuLib.MonoBehaviors;
 using UnityEngine;
 using UnityEngine.Events;
+using Object = UnityEngine.Object;
 
 namespace MenuLib;
 
 public static class MenuAPI
 {
-    internal static RectTransform pageDimmer { get; private set; }
-    internal static RectTransform simplePageTemplate { get; private set; }
-    internal static RectTransform buttonTemplate { get; private set; }
-    internal static RectTransform popupPageTemplate { get; private set; }
-    internal static RectTransform toggleTemplate { get; private set; }
-    internal static RectTransform sliderTemplate { get; private set; }
-    internal static RectTransform keybindTemplate { get; private set; }
-    
-    internal static Action<MenuPageMain> addToMainMenuEvent;
-    internal static Action<MenuPageEsc> addToEscapeMenuEvent;
-
-    private static bool initialized;
+    internal static BuilderDelegate mainMenuBuilderDelegates, escapeMenuBuilderDelegates, lobbyMenuBuilderDelegate;
 
     private static MenuButtonPopUp menuButtonPopup;
+    
+    public delegate void BuilderDelegate(Transform parent);
+    
+    public static void AddElementToMainMenu(BuilderDelegate builderDelegate) => mainMenuBuilderDelegates += builderDelegate;
+    
+    public static void AddElementToEscapeMenu(BuilderDelegate builderDelegate) => escapeMenuBuilderDelegates += builderDelegate;
+    
+    public static void AddElementToLobbyMenu(BuilderDelegate builderDelegate) => lobbyMenuBuilderDelegate += builderDelegate;
 
-    public static void AddElementToMainMenu(REPOElement repoElement, Vector2 newPosition)
-    {
-        addToMainMenuEvent += instance =>
-        {
-            var transform = repoElement.Instantiate();
-            
-            transform.SetParent(instance.transform);
-            repoElement.SetPosition(newPosition);
-            repoElement.afterBeingParented?.Invoke(instance.GetComponent<MenuPage>());
-        };
-    }
-
-    public static void AddElementToEscapeMenu(REPOElement repoElement, Vector2 newPosition)
-    {
-        addToEscapeMenuEvent += instance => {
-            var transform = repoElement.Instantiate();
-            
-            transform.SetParent(instance.transform);
-            repoElement.SetPosition(newPosition);
-            repoElement.afterBeingParented?.Invoke(instance.GetComponent<MenuPage>());
-        };
-    }
-
-    public static void OpenPopup(string header, Color headerColor, string content, string buttonText, Action onClick) => MenuManager.instance.PagePopUp(header, headerColor, content, buttonText);
-
-    public static void OpenPopup(string header, Color headerColor, string content, string leftButtonText, Action onLeftClicked, string rightButtonText, Action onRightClicked = null)
+    public static void CloseAllPagesAddedOnTop() => MenuManager.instance.PageCloseAllAddedOnTop();
+    
+    public static void OpenPopup(string header, Color headerColor, string content, Action onLeftClicked, Action onRightClicked = null)
     {
         if (!menuButtonPopup)
             menuButtonPopup = MenuManager.instance.gameObject.AddComponent<MenuButtonPopUp>();
@@ -60,42 +39,222 @@ public static class MenuAPI
         if (onRightClicked != null)
             menuButtonPopup.option2Event.AddListener(new UnityAction(onRightClicked));
         
-        MenuManager.instance.PagePopUpTwoOptions(menuButtonPopup, header, headerColor, content, leftButtonText, rightButtonText);
+        //Setting the text in here doesn't work
+        MenuManager.instance.PagePopUpTwoOptions(menuButtonPopup, header, headerColor, content, "Yes", "No");
+    }
+    
+    public static REPOButton CreateREPOButton(string text, Action onClick, Transform parent, Vector2 localPosition = default)
+    {
+        var newRectTransform = Object.Instantiate(REPOTemplates.buttonTemplate, parent);
+        newRectTransform.name = $"Menu Button - {text}";
+
+        newRectTransform.localPosition = localPosition;
+        
+        var repoButton = newRectTransform.gameObject.AddComponent<REPOButton>();
+
+        repoButton.labelTMP.text = text;
+        
+        if (onClick != null)
+            repoButton.button.onClick.AddListener(new UnityAction(onClick));
+        
+        return repoButton;
+    }
+    
+    public static REPOToggle CreateREPOToggle(string text, Action<bool> onToggle, Transform parent, Vector2 localPosition = default, string leftButtonText = "ON", string rightButtonText = "OFF", bool defaultValue = false)
+    {
+        var newRectTransform = Object.Instantiate(REPOTemplates.toggleTemplate, parent);
+        newRectTransform.name = $"Menu Toggle - {text}";
+
+        newRectTransform.localPosition = localPosition;
+        
+        var repoToggle = newRectTransform.gameObject.AddComponent<REPOToggle>();
+
+        repoToggle.labelTMP.text = text;
+        repoToggle.leftButtonTMP.text = leftButtonText;
+        repoToggle.rightButtonTMP.text = rightButtonText;
+        repoToggle.onToggle = onToggle;
+        
+        repoToggle.SetState(defaultValue, false);
+        return repoToggle;
+    }
+    
+    public static REPOSlider CreateREPOSlider(string text, string description, Action<float> onValueChanged, Transform parent, Vector2 localPosition = default, float min = 0f, float max = 1f, int precision = 2, float defaultValue = 0f, string prefix = "", string postfix = "", REPOSlider.BarBehavior barBehavior = REPOSlider.BarBehavior.UpdateWithValue)
+    {
+        var newRectTransform = Object.Instantiate(REPOTemplates.sliderTemplate, parent);
+        newRectTransform.name = $"Float Slider - {text}";
+
+        newRectTransform.localPosition = localPosition;
+        
+        var repoSlider = newRectTransform.gameObject.AddComponent<REPOSlider>();
+
+        repoSlider.labelTMP.text = text;
+        repoSlider.descriptionTMP.text = description;
+        repoSlider.onValueChanged = onValueChanged;
+        repoSlider.min = min;
+        repoSlider.max = max;
+        repoSlider.precision = precision;
+        repoSlider.prefix = prefix;
+        repoSlider.postfix = postfix;
+        repoSlider.barBehavior = barBehavior;
+        
+        repoSlider.SetValue(defaultValue, false);
+        return repoSlider;
+    }
+    
+    public static REPOSlider CreateREPOSlider(string text, string description, Action<int> onValueChanged, Transform parent, Vector2 localPosition = default, int min = 0, int max = 1, int defaultValue = 0, string prefix = "", string postfix = "", REPOSlider.BarBehavior barBehavior = REPOSlider.BarBehavior.UpdateWithValue)
+    {
+        var newRectTransform = Object.Instantiate(REPOTemplates.sliderTemplate, parent);
+        newRectTransform.name = $"Int Slider - {text}";
+
+        newRectTransform.localPosition = localPosition;
+        
+        var repoSlider = newRectTransform.gameObject.AddComponent<REPOSlider>();
+
+        repoSlider.labelTMP.text = text;
+        repoSlider.descriptionTMP.text = description;
+        repoSlider.onValueChanged = f => onValueChanged.Invoke(Convert.ToInt32(f));
+        repoSlider.min = min;
+        repoSlider.max = max;
+        repoSlider.precision = 0;
+        repoSlider.prefix = prefix;
+        repoSlider.postfix = postfix;
+        repoSlider.barBehavior = barBehavior;
+        
+        repoSlider.SetValue(defaultValue, false);
+        return repoSlider;
+    }
+    
+    public static REPOSlider CreateREPOSlider(string text, string description, Action<string> onOptionChanged, Transform parent, string[] stringOptions,  string defaultOption, Vector2 localPosition = default, string prefix = "", string postfix = "", REPOSlider.BarBehavior barBehavior = REPOSlider.BarBehavior.UpdateWithValue)
+    {
+        var newRectTransform = Object.Instantiate(REPOTemplates.sliderTemplate, parent);
+        newRectTransform.name = $"Option Slider - {text}";
+
+        newRectTransform.localPosition = localPosition;
+        
+        var repoSlider = newRectTransform.gameObject.AddComponent<REPOSlider>();
+
+        repoSlider.labelTMP.text = text;
+        repoSlider.descriptionTMP.text = description;
+        repoSlider.onValueChanged = f => onOptionChanged.Invoke(repoSlider.stringOptions.ElementAtOrDefault(Convert.ToInt32(f)) ?? repoSlider.stringOptions.FirstOrDefault());
+        repoSlider.stringOptions = stringOptions;
+        repoSlider.prefix = prefix;
+        repoSlider.postfix = postfix;
+        repoSlider.barBehavior = barBehavior;
+
+        var defaultIndex = Array.IndexOf(stringOptions, defaultOption);
+
+        if (defaultIndex == -1)
+            defaultIndex = 0;
+        
+        repoSlider.SetValue(defaultIndex, false);
+        return repoSlider;
+    }
+    
+    public static REPOSlider CreateREPOSlider(string text, string description, Action<int> onOptionChanged, Transform parent, string[] stringOptions,  string defaultOption, Vector2 localPosition = default, string prefix = "", string postfix = "", REPOSlider.BarBehavior barBehavior = REPOSlider.BarBehavior.UpdateWithValue)
+    {
+        var newRectTransform = Object.Instantiate(REPOTemplates.sliderTemplate, parent);
+        newRectTransform.name = $"Option Slider - {text}";
+
+        newRectTransform.localPosition = localPosition;
+        
+        var repoSlider = newRectTransform.gameObject.AddComponent<REPOSlider>();
+
+        repoSlider.labelTMP.text = text;
+        repoSlider.descriptionTMP.text = description;
+        repoSlider.onValueChanged = f => onOptionChanged.Invoke(Convert.ToInt32(f));
+        repoSlider.stringOptions = stringOptions;
+        repoSlider.prefix = prefix;
+        repoSlider.postfix = postfix;
+        repoSlider.barBehavior = barBehavior;
+
+        var defaultIndex = Array.IndexOf(stringOptions, defaultOption);
+
+        if (defaultIndex == -1)
+            defaultIndex = 0;
+        
+        repoSlider.SetValue(defaultIndex, false);
+        return repoSlider;
     }
 
-    internal static void Initialize()
+    public static REPOLabel CreateREPOLabel(string text, Transform parent, Vector2 localPosition = default)
     {
-        if (initialized)
-            return;
+        var newRectTransform = Object.Instantiate(REPOTemplates.labelTemplate, parent);
+        newRectTransform.name = $"Label - {text}";
+
+        newRectTransform.localPosition = localPosition;
         
-        var menuPages = MenuManager.instance.menuPages;
+        var repoLabel = newRectTransform.gameObject.AddComponent<REPOLabel>();
 
-        foreach (var menuPageData in menuPages)
+        repoLabel.labelTMP.text = text;
+        
+        return repoLabel;
+    }
+    
+    public static REPOSpacer CreateREPOSpacer(Transform parent, Vector2 localPosition = default, Vector2 size = default)
+    {
+        var newRectTransform = (RectTransform) new GameObject("Spacer", typeof(RectTransform)).transform;
+
+        newRectTransform.SetParent(parent);
+        
+        var repoSpacer = newRectTransform.gameObject.AddComponent<REPOSpacer>();
+
+        newRectTransform.localPosition = localPosition;
+        newRectTransform.sizeDelta = size;
+        
+        return repoSpacer;
+    }
+    
+    public static REPOPopupPage CreateREPOPopupPage(string headerText, REPOPopupPage.PresetSide presetSide, bool pageDimmerVisibility = false, float spacing = 0) => CreateREPOPopupPage(headerText, pageDimmerVisibility, spacing, presetSide == REPOPopupPage.PresetSide.Left ? null : new Vector2(40, 0));
+    
+    public static REPOPopupPage CreateREPOPopupPage(string headerText, bool pageDimmerVisibility = false, float spacing = 0, Vector2? localPosition = null)
+    {
+        var newRectTransform = Object.Instantiate(REPOTemplates.popupPageTemplate, MenuHolder.instance.transform);
+        newRectTransform.name = $"Menu Page {headerText}";
+        
+        var repoPopupPage = newRectTransform.gameObject.AddComponent<REPOPopupPage>();
+        
+        repoPopupPage.rectTransform.localPosition = localPosition ?? new Vector2(-280, 0);
+        repoPopupPage.pageDimmerVisibility = pageDimmerVisibility;
+        repoPopupPage.headerTMP.text = headerText;
+
+        repoPopupPage.scrollView.spacing = spacing;
+        
+        return repoPopupPage;
+    }
+
+    internal static void OpenPage(MenuPage menuPage, bool pageOnTop)
+    {
+        var currentMenuPage = REPOReflection.menuManager_CurrentMenuPage.GetValue(MenuManager.instance) as MenuPage;
+
+        var addedPagesOnTop = REPOReflection.menuManager_AddedPagesOnTop.GetValue(MenuManager.instance) as List<MenuPage>; 
+        
+        switch (pageOnTop)
         {
-            var menuPageTransform = menuPageData.menuPage.transform;
-            
-            switch (menuPageData.menuPageIndex)
-            {
-                case MenuPageIndex.Main:
-                    simplePageTemplate = (RectTransform) menuPageTransform;
-                    buttonTemplate = (RectTransform) simplePageTemplate.Find("Menu Button - Quit game");
-                    break;
-                case MenuPageIndex.Settings:
-                    pageDimmer = (RectTransform) menuPageTransform.GetChild(0);
-                    break;
-                case MenuPageIndex.SettingsGraphics:
-                    popupPageTemplate = (RectTransform) menuPageTransform;
-                    break;
-                case MenuPageIndex.SettingsAudio:
-                    toggleTemplate = (RectTransform) menuPageTransform.Find("Menu Scroll Box/Mask/Scroller/Bool Setting - Push to Talk");
-                    sliderTemplate = (RectTransform) menuPageTransform.Find("Menu Scroll Box/Mask/Scroller/Slider - microphone");
-                    break;
-                case MenuPageIndex.SettingsControls:
-                    keybindTemplate = (RectTransform) menuPageTransform.Find("Scroll Box/Mask/Scroller/Big Button move forward");
-                    break;
-            }
+            case true when addedPagesOnTop == null || addedPagesOnTop.Contains(currentMenuPage):
+                return;
+            case false:
+                REPOReflection.menuManager_PageInactiveAdd.Invoke(MenuManager.instance, [ currentMenuPage ]);
+                currentMenuPage?.PageStateSet(MenuPage.PageState.Inactive);
+                break;
         }
-
-        initialized = true;
+        
+        menuPage.gameObject.SetActive(true);
+        menuPage.transform.localPosition = Vector3.zero;
+        MenuManager.instance.PageAdd(menuPage);
+        menuPage.StartCoroutine(REPOReflection.menuPage_LateStart.Invoke(menuPage, null) as IEnumerator);
+            
+        REPOReflection.menuPage_AddedPageOnTop.SetValue(menuPage, false);
+        
+        if (!pageOnTop)
+        {
+            MenuManager.instance.PageSetCurrent(menuPage.menuPageIndex, menuPage);
+        
+            REPOReflection.menuPage_PageIsOnTopOfOtherPage.SetValue(menuPage, true);
+            REPOReflection.menuPage_PageUnderThisPage.SetValue(menuPage, currentMenuPage);
+            return;
+        }
+        
+        REPOReflection.menuPage_ParentPage.SetValue(menuPage, currentMenuPage);
+        addedPagesOnTop.Add(menuPage);
     }
 }

@@ -9,31 +9,31 @@ using UnityEngine;
 
 namespace MenuLib
 {
-    [BepInPlugin("nickklmao.menulib", MOD_NAME, "1.0.5")]
+    [BepInPlugin("nickklmao.menulib", MOD_NAME, "2.0.0")]
     internal sealed class Entry : BaseUnityPlugin
     {
         private const string MOD_NAME = "Menu Lib";
         
         internal static readonly ManualLogSource logger = BepInEx.Logging.Logger.CreateLogSource(MOD_NAME);
-
-        private static void MenuManager_StartHook(Action<MenuManager> orig, MenuManager self)
-        {
-            orig.Invoke(self);
-            MenuAPI.Initialize();
-        }
         
         private static void MenuPageMain_StartHook(Action<MenuPageMain> orig, MenuPageMain self)
         {
             orig.Invoke(self);
-            MenuAPI.addToMainMenuEvent?.Invoke(self);
+            MenuAPI.mainMenuBuilderDelegates?.Invoke(self.transform);
         }
         
         private static void MenuPageEsc_StartHook(Action<MenuPageEsc> orig, MenuPageEsc self)
         {
             orig.Invoke(self);
-            MenuAPI.addToEscapeMenuEvent?.Invoke(self);
+			MenuAPI.escapeMenuBuilderDelegates?.Invoke(self.transform);
         }
         
+        private static void MenuPageLobby_StartHook(Action<MenuPageLobby> orig, MenuPageLobby self)
+        {
+            orig.Invoke(self);
+            MenuAPI.lobbyMenuBuilderDelegate?.Invoke(self.transform);
+        }
+
         private static void SemiFunc_UIMouseHoverILHook(ILContext il)
         {
             var cursor = new ILCursor(il);
@@ -46,7 +46,7 @@ namespace MenuLib
             cursor.Emit(OpCodes.Ldloc_0);
             cursor.EmitDelegate((MenuScrollBox menuScrollBox, Vector2 vector) =>
             {
-                var mask = (RectTransform) menuScrollBox.transform.Find("Mask");
+                var mask = (RectTransform) menuScrollBox.scroller.parent;
 
                 var bottom = mask.position.y;
                 var top = bottom + mask.sizeDelta.y;
@@ -65,14 +65,14 @@ namespace MenuLib
         
         private void Awake()
         {
-            logger.LogDebug("Hooking `MenuManager.Start`");
-            new Hook(AccessTools.Method(typeof(MenuManager), "Start"), MenuManager_StartHook);
-            
             logger.LogDebug("Hooking `MenuPageMain.Start`");
             new Hook(AccessTools.Method(typeof(MenuPageMain), "Start"), MenuPageMain_StartHook);
             
             logger.LogDebug("Hooking `MenuPageEsc.Start`");
             new Hook(AccessTools.Method(typeof(MenuPageEsc), "Start"), MenuPageEsc_StartHook);
+            
+            logger.LogDebug("Hooking `MenuPageLobby.Start`");
+            new Hook(AccessTools.Method(typeof(MenuPageLobby), "Start"), MenuPageLobby_StartHook);
             
             logger.LogDebug("Hooking `SemiFunc.UIMouseHover`");
             new ILHook(AccessTools.Method(typeof(SemiFunc), "UIMouseHover"), SemiFunc_UIMouseHoverILHook);

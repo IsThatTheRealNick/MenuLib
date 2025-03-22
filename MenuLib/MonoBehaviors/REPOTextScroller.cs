@@ -8,14 +8,11 @@ public sealed class REPOTextScroller : MonoBehaviour
 {
     public TMP_Text textMeshPro;
     public int maxCharacters;
-    
-    public float initialWaitTime = 5;
-    public float startWaitTime = 3;
-    public float scrollingSpeedInSecondsPerCharacter = .5f;
-    public float endWaitTime = 3;
+        
+    public float initialWaitTime = 5, startWaitTime = 3, endWaitTime = 3, scrollingSpeedInSecondsPerCharacter = .5f;
 
     private bool isInitial = true;
-    
+        
     public IEnumerator Animate()
     {
         while (true)
@@ -30,14 +27,14 @@ public sealed class REPOTextScroller : MonoBehaviour
             }
             else
                 yield return new WaitForSeconds(startWaitTime);
-            
+                
             while (textMeshPro.maxVisibleCharacters < textMeshPro.text.Length)
             {
                 textMeshPro.firstVisibleCharacter++;
                 textMeshPro.maxVisibleCharacters++;
                 yield return new WaitForSeconds(scrollingSpeedInSecondsPerCharacter);
             }
-            
+                
             yield return new WaitForSeconds(endWaitTime);
         }
     }

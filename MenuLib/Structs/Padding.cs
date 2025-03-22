@@ -1,8 +1,8 @@
-﻿namespace MenuLib;
+﻿namespace MenuLib.Structs;
 
 public struct Padding
 {
-    public readonly float left, top, right, bottom;
+    public float left, top, right, bottom;
 
     public Padding(float left, float top, float right, float bottom)
     {
