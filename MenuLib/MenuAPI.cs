@@ -76,6 +76,24 @@ public static class MenuAPI
         repoToggle.SetState(defaultValue, false);
         return repoToggle;
     }
+    
+    public static REPOSlider CreateREPOSlider(string text, Action<float> onValueChanged, Transform parent, Vector2 localPosition = default,  float defaultValue = 0f)
+    {
+        var newRectTransform = Object.Instantiate(REPOTemplates.sliderTemplate, parent);
+        newRectTransform.name = $"Float Slider - {text}";
+
+        newRectTransform.localPosition = localPosition;
+        
+        var repoSlider = newRectTransform.gameObject.AddComponent<REPOSlider>();
+
+        repoSlider.labelTMP.text = text;
+        /*repoSlider.leftButtonTMP.text = leftButtonText;
+        repoSlider.rightButtonTMP.text = rightButtonText;
+        repoSlider.onToggle = onToggle;*/
+        
+        //repoSlider.SetState(defaultValue, false);
+        return repoSlider;
+    }
 
     public static REPOLabel CreateREPOLabel(string text, Transform parent, Vector2 localPosition = default)
     {

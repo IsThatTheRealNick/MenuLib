@@ -38,53 +38,29 @@ public sealed class REPOToggle : MonoBehaviour, IREPOElement
         optionBox = (RectTransform) transform.Find("Option Box");
         optionBoxBehind = (RectTransform) transform.Find("Option Box Behind");
 
-        var background = transform.Find("SliderBG");
-        var backgroundLocalPosition = background.localPosition;
-        backgroundLocalPosition.x += 100;
-        background.localPosition = backgroundLocalPosition;
+        var horizontalShift = Vector3.right * 100f;
+        
+        transform.Find("SliderBG").localPosition += horizontalShift;
 
-        var labelSizeDelta = labelTMP.rectTransform.sizeDelta;
-        labelSizeDelta.y -= 4;
-        labelTMP.rectTransform.sizeDelta = labelSizeDelta;
-        
-        var labelLocalPosition = labelTMP.rectTransform.localPosition;
-        labelLocalPosition.x += 100;
-        labelTMP.rectTransform.localPosition = labelLocalPosition;
-        
-        var outline = transform.Find("RawImage");
-        var outlineLocalPosition = outline.localPosition;
-        outlineLocalPosition.x += 100;
-        outline.localPosition = outlineLocalPosition;
-        
-        var fill = transform.Find("RawImage (1)");
-        var fillLocalPosition = fill.localPosition;
-        fillLocalPosition.x += 100;
-        fill.localPosition = fillLocalPosition;
-        
-        var separator = transform.Find("RawImage (2)");
-        var separatorLocalPosition = separator.localPosition;
-        separatorLocalPosition.x += 100;
-        separator.localPosition = separatorLocalPosition;
-        
+        labelTMP.rectTransform.sizeDelta -= new Vector2(0, 4);
+
+        labelTMP.rectTransform.localPosition += horizontalShift;
+
+        transform.Find("RawImage").localPosition += horizontalShift;
+        transform.Find("RawImage (1)").localPosition += horizontalShift;
+        transform.Find("RawImage (2)").localPosition += horizontalShift;
+       
         var buttons = GetComponentsInChildren<Button>();
         
         var leftButton = buttons[0];
-
-        var leftButtonLocalPosition = leftButton.transform.localPosition;
-        leftButtonLocalPosition.x += 100;
-        leftButton.transform.localPosition = leftButtonLocalPosition;
-        
+        leftButton.transform.localPosition += horizontalShift;
         leftButton.onClick = new Button.ButtonClickedEvent();
         leftButton.onClick.AddListener(() => SetState(true, true));
         
         leftButtonTMP = leftButton.GetComponentInChildren<TextMeshProUGUI>();
         
         var rightButton = buttons[1];
-        
-        var rightButtonLocalPosition = rightButton.transform.localPosition;
-        rightButtonLocalPosition.x += 100;
-        rightButton.transform.localPosition = rightButtonLocalPosition;
-        
+        rightButton.transform.localPosition += horizontalShift;
         rightButton.onClick = new Button.ButtonClickedEvent();
         rightButton.onClick.AddListener(() => SetState(false, true));
         rightButtonTMP = rightButton.GetComponentInChildren<TextMeshProUGUI>();
