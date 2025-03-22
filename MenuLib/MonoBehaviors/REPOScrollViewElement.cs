@@ -5,9 +5,25 @@ namespace MenuLib.MonoBehaviors;
 
 internal sealed class REPOScrollViewElement : MonoBehaviour
 {
-    public Action onActiveStateChanged;
+    public RectTransform rectTransform;
 
-    private void OnEnable() => onActiveStateChanged?.Invoke();
+    public Action onVisibilityChanged;
+
+    public bool visibility
+    {
+        get => _visibility;
+        set
+        {
+            if (_visibility == value)
+                return;
+            
+            onVisibilityChanged?.Invoke();
+            gameObject.SetActive(value);
+            _visibility = value;
+        }
+    }
+
+    private bool _visibility = true;
     
-    private void OnDisable() => onActiveStateChanged?.Invoke();
+    private void Awake() => rectTransform = transform as RectTransform;
 }

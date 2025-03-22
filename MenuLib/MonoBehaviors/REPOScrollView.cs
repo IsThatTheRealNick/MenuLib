@@ -6,26 +6,28 @@ namespace MenuLib.MonoBehaviors;
 internal sealed class REPOScrollView : MonoBehaviour
 {
     internal REPOPopupPage popupPage;
+
+    private REPOScrollViewElement[] scrollViewElements = [];
     
     public void UpdateElements()
     {
+        scrollViewElements = GetComponentsInChildren<REPOScrollViewElement>(true);
+        
         var lastElementYPosition = 0f;
         var yPosition = popupPage.maskRectTransform.sizeDelta.y;
-        
-        for (var i = 2; i < transform.childCount; i++)
-        {
-            var child = (RectTransform)transform.GetChild(i);
 
-            if (!child.gameObject.activeSelf)
+        foreach (var scrollViewElement in scrollViewElements)
+        {
+            if (!scrollViewElement.visibility)
                 continue;
             
-            var localPosition = child.localPosition;
+            var localPosition = scrollViewElement.rectTransform.localPosition;
             
-            yPosition -= child.rect.height * (1f - child.pivot.y);
+            yPosition -= scrollViewElement.rectTransform.rect.height * (1f - scrollViewElement.rectTransform.pivot.y);
             localPosition.y = yPosition;
             lastElementYPosition = yPosition;
 
-            child.localPosition = localPosition;
+            scrollViewElement.rectTransform.localPosition = localPosition;
         }
         
         var scrollBarGameObject = popupPage.scrollBarRectTransform.gameObject;
@@ -44,6 +46,29 @@ internal sealed class REPOScrollView : MonoBehaviour
         
         var divisor = 1f - menuScrollBox.scrollHandle.rect.height * .5f / menuScrollBox.scrollBarBackground.rect.height * 1.1f;
         REPOReflection.menuScrollBox_scrollerStartPosition.SetValue(menuScrollBox, Math.Abs(lastElementYPosition/divisor));
+    }
+
+    private void Update()
+    {
+        var maskRectTransform = popupPage.maskRectTransform;
+
+        foreach (var scrollViewElement in scrollViewElements)
+        {
+            var elementPosition = scrollViewElement.transform.position;
+            var isInRange = elementPosition.y <= maskRectTransform.position.y + maskRectTransform.sizeDelta.y && elementPosition.y >= maskRectTransform.position.y;
+
+            var elementGameObject = scrollViewElement.gameObject; 
+            
+            switch (isInRange)
+            {
+                case false when elementGameObject.activeSelf:
+                    elementGameObject.SetActive(false);
+                    break;
+                case true when !elementGameObject.activeSelf:
+                    elementGameObject.SetActive(true);
+                    break;
+            }   
+        }
     }
 
     private void OnTransformChildrenChanged() => UpdateElements();

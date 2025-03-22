@@ -1,32 +1,126 @@
-﻿using MenuLib.Interfaces;
+﻿using System;
+using System.Globalization;
+using MenuLib.Interfaces;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace MenuLib.MonoBehaviors;
 
 public sealed class REPOSlider : MonoBehaviour, IREPOElement
 {
+    public enum BarBehavior
+    {
+        UpdateWithValue,
+        StaticAtMinimum,
+        StaticAtMaximum
+    }
+    
+    public enum BarDirection
+    {
+        Horizontal,
+        Vertical
+    }
+
+    private static readonly Vector2 menuSelectionBoxCustomOffset = new(-3f, 0f), menuSelectionBoxCustomScale = new(20f, 10f);
+    
     public RectTransform rectTransform { get; private set; }
+    
+    public TextMeshProUGUI labelTMP, descriptionTMP;
 
-    public TextMeshProUGUI labelTMP;
+    public Action<float> onValueChanged;
 
-    private RectTransform barRectTransform, barPointerRectTransform;
+    public BarBehavior barBehavior;
+    public BarDirection barDirection;
+
+    public float value, min, max = 1;
+
+    public float precision
+    {
+        get => _precision;
+        set
+        {
+            precisionDecimal = value == 0 ? 1 : Mathf.Pow(10, -value);
+            _precision = value;
+        }
+    }
+    
+    private RectTransform barRectTransform, barSizeRectTransform, barPointerRectTransform, barMaskRectTransform;
     private TextMeshProUGUI valueTMP, maskedValueTMP;
+    
+    private MenuPage menuPage;
+    private MenuSelectableElement menuSelectableElement;
+
+    private float normalizedValue => (value - min) / (max - min);
+    private float previousValue, _precision = 2, precisionDecimal = .01f;
+    private bool isHovering;
+
+    private bool hasValueChanged => Math.Abs(value - previousValue) > float.Epsilon;
+    
+    public void SetValue(float newValue, bool invokeCallback)
+    {
+        newValue = Mathf.Clamp(newValue, min, max);
+        
+        if (invokeCallback && Math.Abs(value - newValue) > float.Epsilon)
+            onValueChanged.Invoke(newValue);
+
+        previousValue = value = newValue;
+        
+        UpdateBarVisual();
+        UpdateBarText();
+    }
+
+    public void Decrement()
+    {
+        var newValue = value - precisionDecimal;
+
+        if (Math.Abs(value - min) < float.Epsilon)
+            newValue = max;
+        else if (newValue < min)
+            newValue = min;
+        
+        SetValue(newValue, true);
+    }
+
+    public void Increment()
+    {
+        var newValue = value + precisionDecimal;
+
+        if (Math.Abs(max - value) < float.Epsilon)
+            newValue = min;
+        else if (newValue > max)
+            newValue = max;
+        
+        SetValue(newValue, true);
+    }
     
     private void Awake()
     {
         rectTransform = transform as RectTransform;
+        menuPage = GetComponentInParent<MenuPage>();
+        menuSelectableElement = GetComponent<MenuSelectableElement>();
         labelTMP = GetComponentInChildren<TextMeshProUGUI>();
+        descriptionTMP = transform.Find("Big Setting Text").GetComponent<TextMeshProUGUI>();
         valueTMP = transform.Find("Bar Text").GetComponent<TextMeshProUGUI>();
-        maskedValueTMP = transform.Find("MaskedText").GetComponentInChildren<TextMeshProUGUI>();
+        barMaskRectTransform = (RectTransform) transform.Find("MaskedText"); 
+        maskedValueTMP = barMaskRectTransform.GetComponentInChildren<TextMeshProUGUI>();
         barPointerRectTransform = (RectTransform) transform.Find("Bar Pointer").transform;
 
         var horizontalShift = Vector3.right * 5.3f;
         
         labelTMP.rectTransform.localPosition -= horizontalShift;
+
+        descriptionTMP.alignment = TextAlignmentOptions.Left;
+        descriptionTMP.enableWordWrapping = descriptionTMP.enableAutoSizing = false;
+        descriptionTMP.overflowMode = TextOverflowModes.Masking;
+        descriptionTMP.fontSize -= 5;
+
+        descriptionTMP.rectTransform.sizeDelta -= new Vector2(0, 4);
+
         transform.Find("SliderBG").localPosition -= horizontalShift;
 
-        maskedValueTMP.rectTransform.parent.localPosition = valueTMP.rectTransform.localPosition -= horizontalShift;
+        valueTMP.rectTransform.localPosition -= horizontalShift;
+        maskedValueTMP.rectTransform.parent.localPosition -= horizontalShift;
         
         var bar = transform.Find("Bar");
         bar.localPosition -= horizontalShift;
@@ -35,12 +129,114 @@ public sealed class REPOSlider : MonoBehaviour, IREPOElement
         barRectTransform.pivot = Vector2.zero;
         barRectTransform.localPosition = new Vector2(0f, -5f);
 
+        barSizeRectTransform = (RectTransform) transform.Find("BarSize");
+        barSizeRectTransform.localPosition -= horizontalShift;
+        
         var labelSizeDelta = labelTMP.rectTransform.sizeDelta;
         labelSizeDelta.y -= 10;
         labelTMP.rectTransform.sizeDelta = labelSizeDelta;
         
+        var buttons = GetComponentsInChildren<Button>();
+
+        var decrementButton = buttons[0];
+        decrementButton.transform.localPosition -= horizontalShift;
+        decrementButton.onClick = new Button.ButtonClickedEvent();
+        decrementButton.onClick.AddListener(Decrement);
+        
+        var incrementButton = buttons[1];
+        incrementButton.transform.localPosition -= horizontalShift;
+        incrementButton.onClick = new Button.ButtonClickedEvent();
+        incrementButton.onClick.AddListener(Increment);
+        
         Destroy(bar.Find("Extra Bar").gameObject);
         Destroy(GetComponent<MenuSliderMicrophone>());
         Destroy(GetComponent<MenuSlider>());
+    }
+
+    private void Update()
+    {
+        var isHoveringUI = SemiFunc.UIMouseHover(menuPage, barSizeRectTransform, REPOReflection.menuSelectableElement_menuID.GetValue(menuSelectableElement) as string, 5f, 5f);
+
+        if (isHoveringUI)
+        {
+            if (!isHovering)
+                MenuManager.instance.MenuEffectHover(SemiFunc.MenuGetPitchFromYPos(rectTransform));
+            
+            isHovering = true;
+            
+            SemiFunc.MenuSelectionBoxTargetSet(menuPage, barSizeRectTransform, menuSelectionBoxCustomOffset, menuSelectionBoxCustomScale);
+            
+            if (!barPointerRectTransform.gameObject.activeSelf)
+                barPointerRectTransform.gameObject.SetActive(true);
+            
+            HandleHovering();
+        }
+        else
+        {
+            isHovering = false;
+
+            if (barPointerRectTransform.gameObject.activeSelf)
+            {
+                barPointerRectTransform.localPosition = barPointerRectTransform.localPosition with { x = -1000f };
+                barPointerRectTransform.gameObject.SetActive(false);
+            }
+        }
+
+        if (!hasValueChanged)
+            return;
+        
+        value = Mathf.Clamp(value, min, max);
+        
+        UpdateBarVisual();
+        UpdateBarText();
+        
+        onValueChanged.Invoke(previousValue = value);
+    }
+
+    private void HandleHovering()
+    {
+        var pointInRect = SemiFunc.UIMouseGetLocalPositionWithinRectTransform(barSizeRectTransform).x;
+        
+        var multiplier = max - min;
+        var steps = precisionDecimal / multiplier;
+        var normalized = Mathf.Round(Mathf.Clamp01(pointInRect / barSizeRectTransform.sizeDelta.x) / steps) * steps;
+        
+        var newXPos = Mathf.Clamp(barSizeRectTransform.localPosition.x + normalized * barSizeRectTransform.sizeDelta.x, barSizeRectTransform.localPosition.x,
+            barSizeRectTransform.localPosition.x + barSizeRectTransform.sizeDelta.x) - 2f;
+
+        barPointerRectTransform.localPosition = barPointerRectTransform.localPosition with { x = newXPos };
+
+        if (!Input.GetMouseButton(0))
+            return;
+        
+        value = min + normalized * multiplier;
+        
+        if (hasValueChanged)
+            MenuManager.instance.MenuEffectClick(MenuManager.MenuClickEffectType.Tick, menuPage);
+    }
+    
+    private void UpdateBarVisual()
+    {
+        var newNormalizedBarValue = barBehavior switch
+        {
+            BarBehavior.UpdateWithValue => normalizedValue,
+            BarBehavior.StaticAtMinimum => 0,
+            BarBehavior.StaticAtMaximum => 1,
+            _ => throw new ArgumentOutOfRangeException()
+        };
+
+        barMaskRectTransform.sizeDelta = barRectTransform.sizeDelta = barDirection switch
+        {
+            BarDirection.Horizontal => new Vector2(newNormalizedBarValue * 100, 10),
+            BarDirection.Vertical => new Vector2(100, newNormalizedBarValue * 10),
+            _ => throw new ArgumentOutOfRangeException()
+        };
+    }
+
+    private void UpdateBarText()
+    {
+        var tempValue = normalizedValue;
+        
+        maskedValueTMP.text = valueTMP.text = tempValue.ToString($"F{precision}", CultureInfo.CurrentCulture);
     }
 }

@@ -77,7 +77,7 @@ public static class MenuAPI
         return repoToggle;
     }
     
-    public static REPOSlider CreateREPOSlider(string text, Action<float> onValueChanged, Transform parent, Vector2 localPosition = default,  float defaultValue = 0f)
+    public static REPOSlider CreateREPOSlider(string text, string description, Action<float> onValueChanged, Transform parent, Vector2 localPosition = default, float min = 0f, float max = 1f, float precision = 2f, float defaultValue = 0f, REPOSlider.BarDirection barDirection = REPOSlider.BarDirection.Horizontal, REPOSlider.BarBehavior barBehavior = REPOSlider.BarBehavior.UpdateWithValue)
     {
         var newRectTransform = Object.Instantiate(REPOTemplates.sliderTemplate, parent);
         newRectTransform.name = $"Float Slider - {text}";
@@ -87,11 +87,37 @@ public static class MenuAPI
         var repoSlider = newRectTransform.gameObject.AddComponent<REPOSlider>();
 
         repoSlider.labelTMP.text = text;
-        /*repoSlider.leftButtonTMP.text = leftButtonText;
-        repoSlider.rightButtonTMP.text = rightButtonText;
-        repoSlider.onToggle = onToggle;*/
+        repoSlider.descriptionTMP.text = description; //Add text scroller
+        repoSlider.onValueChanged = onValueChanged;
+        repoSlider.min = min;
+        repoSlider.max = max;
+        repoSlider.precision = precision;
+        repoSlider.barDirection = barDirection;
+        repoSlider.barBehavior = barBehavior;
         
-        //repoSlider.SetState(defaultValue, false);
+        repoSlider.SetValue(defaultValue, false);
+        return repoSlider;
+    }
+    
+    public static REPOSlider CreateREPOSlider(string text, string description, Action<int> onValueChanged, Transform parent, Vector2 localPosition = default, int min = 0, int max = 1, int defaultValue = 0, REPOSlider.BarDirection barDirection = REPOSlider.BarDirection.Horizontal, REPOSlider.BarBehavior barBehavior = REPOSlider.BarBehavior.UpdateWithValue)
+    {
+        var newRectTransform = Object.Instantiate(REPOTemplates.sliderTemplate, parent);
+        newRectTransform.name = $"Float Slider - {text}";
+
+        newRectTransform.localPosition = localPosition;
+        
+        var repoSlider = newRectTransform.gameObject.AddComponent<REPOSlider>();
+
+        repoSlider.labelTMP.text = text;
+        repoSlider.descriptionTMP.text = description; //Add text scroller
+        repoSlider.onValueChanged = f => onValueChanged.Invoke(Convert.ToInt32(f));
+        repoSlider.min = min;
+        repoSlider.max = max;
+        repoSlider.precision = 0;
+        repoSlider.barDirection = barDirection;
+        repoSlider.barBehavior = barBehavior;
+        
+        repoSlider.SetValue(defaultValue, false);
         return repoSlider;
     }
 
