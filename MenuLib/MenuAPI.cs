@@ -259,7 +259,10 @@ public static class MenuAPI
         }
 
         if (cachedMenuPages.Contains(menuPage))
+        {
             menuPage.PageStateSet(MenuPage.PageState.Opening);
+            menuPage.transform.SetAsLastSibling();
+        }
         
         if (!menuPage.gameObject.activeSelf)
             menuPage.gameObject.SetActive(true);
