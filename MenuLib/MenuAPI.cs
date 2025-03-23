@@ -203,7 +203,23 @@ public static class MenuAPI
         
         return repoSpacer;
     }
-    
+
+    public static REPOAvatarPreview CreateREPOAvatarPreview(Transform parent, Vector3? localPosition = null)
+    {
+        Transform transform = Object.Instantiate(REPOTemplates.avatarPreviewTemplate, parent);
+        transform.SetParent(parent, true);
+
+        var repoPlayerAvatar = transform.gameObject.AddComponent<REPOAvatarPreview>();
+
+        if (localPosition.HasValue)
+        {
+            transform.localPosition = localPosition.Value;
+        }
+        // else, default to original position from escape menu
+        
+        return repoPlayerAvatar;
+    }
+
     [Obsolete("Switch to the overload with the 'shouldCachePage' argument!")]
     public static REPOPopupPage CreateREPOPopupPage(string headerText, REPOPopupPage.PresetSide presetSide, bool pageDimmerVisibility = false, float spacing = 0) => CreateREPOPopupPage(headerText, pageDimmerVisibility, spacing, presetSide == REPOPopupPage.PresetSide.Left ? null : new Vector2(40, 0));
 

@@ -12,6 +12,7 @@ internal static class REPOTemplates
     internal static readonly RectTransform sliderTemplate;
     internal static readonly RectTransform keybindTemplate;
     internal static readonly RectTransform labelTemplate;
+    internal static readonly Transform avatarPreviewTemplate;
 
     static REPOTemplates()
     {
@@ -27,6 +28,11 @@ internal static class REPOTemplates
                 {
                     simplePageTemplate = (RectTransform) menuPageTransform;
                     buttonTemplate = (RectTransform) simplePageTemplate.Find("Menu Button - Quit game");
+                    break;
+                }
+                case MenuPageIndex.Escape:
+                {
+                    avatarPreviewTemplate = menuPageTransform.Find("Menu Element Player Avatar");
                     break;
                 }
                 case MenuPageIndex.Settings:
