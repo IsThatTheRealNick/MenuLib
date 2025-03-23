@@ -1,4 +1,5 @@
-﻿using MenuLib.Structs;
+﻿using System.Collections;
+using MenuLib.Structs;
 using TMPro;
 using UnityEngine;
 
@@ -153,20 +154,23 @@ public sealed class REPOPopupPage : MonoBehaviour
         menuScrollBox.scroller.localPosition = menuScrollBox.scroller.localPosition with { y = 0 };
         
         REPOReflection.menuPage_ScrollBoxes.SetValue(menuPage, 2);
-        
+
         if (isCachedPage)
             menuPage.PageStateSet(MenuPage.PageState.Closing);
+        else
+            StartCoroutine(ResetMenuPage());
+        
+        return;
+        IEnumerator ResetMenuPage()
+        {
+            yield return new WaitForSeconds(0.5f);
+            menuPage.ResetPage();
+        }
     }
 
     private void Update()
     {
         var pageState = (MenuPage.PageState) REPOReflection.menuPage_currentPageState.GetValue(menuPage);
-
-        if (!fixedNonCachedPage && !isCachedPage && pageState == MenuPage.PageState.Inactive)
-        {
-            menuPage.ResetPage();
-            fixedNonCachedPage = true;
-        }
         
         if (!SemiFunc.InputDown(InputKey.Back) || pageState == MenuPage.PageState.Closing)
             return;
