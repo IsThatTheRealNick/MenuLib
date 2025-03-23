@@ -76,7 +76,6 @@ namespace MenuLib
             cursor.Emit(OpCodes.Ldarg_0);
             cursor.EmitDelegate((MenuPage menuPage) =>
             {
-                
                 if (MenuAPI.customMenuPages.TryGetValue(menuPage, out var repoPopupPage) && repoPopupPage.isCachedPage)
                     return;
                 

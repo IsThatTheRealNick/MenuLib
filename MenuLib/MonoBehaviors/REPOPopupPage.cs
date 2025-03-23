@@ -1,4 +1,5 @@
-﻿using MenuLib.Structs;
+﻿using System;
+using MenuLib.Structs;
 using TMPro;
 using UnityEngine;
 
@@ -63,6 +64,8 @@ public sealed class REPOPopupPage : MonoBehaviour
     private Vector2 defaultMaskSizeDelta, defaultMaskPosition;
     private Padding _maskPadding;
 
+    private bool fixedNonCachedPage;
+
     public void OpenPage(bool openOnTop) => MenuAPI.OpenMenuPage(menuPage, openOnTop);
 
     public void ClosePage(bool closePagesAddedOnTop) => MenuAPI.CloseMenuPage(menuPage, closePagesAddedOnTop);
@@ -114,6 +117,9 @@ public sealed class REPOPopupPage : MonoBehaviour
         pageDimmerGameObject.transform.SetAsFirstSibling();
 
         menuPage.menuPageIndex = (MenuPageIndex) (-1);
+        
+        if (isCachedPage)
+            menuPage.PageStateSet(MenuPage.PageState.Closing);
 
         var scroller = menuScrollBox.scroller;
         
@@ -145,14 +151,17 @@ public sealed class REPOPopupPage : MonoBehaviour
         menuScrollBox.scroller.localPosition = menuScrollBox.scroller.localPosition with { y = 0 };
         
         REPOReflection.menuPage_ScrollBoxes.SetValue(menuPage, 2);
-        
-        if (isCachedPage)
-            menuPage.PageStateSet(MenuPage.PageState.Closing);
     }
 
     private void Update()
     {
         var pageState = (MenuPage.PageState) REPOReflection.menuPage_currentPageState.GetValue(menuPage);
+
+        if (!fixedNonCachedPage && !isCachedPage && pageState == MenuPage.PageState.Inactive)
+        {
+            menuPage.ResetPage();
+            fixedNonCachedPage = true;
+        }
         
         if (!SemiFunc.InputDown(InputKey.Back) || pageState == MenuPage.PageState.Closing)
             return;

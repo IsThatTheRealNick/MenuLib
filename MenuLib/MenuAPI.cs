@@ -213,11 +213,11 @@ public static class MenuAPI
     public static REPOPopupPage CreateREPOPopupPage(string headerText, REPOPopupPage.PresetSide presetSide, bool pageDimmerVisibility = false, float spacing = 0) => CreateREPOPopupPage(headerText, pageDimmerVisibility, spacing, presetSide == REPOPopupPage.PresetSide.Left ? null : new Vector2(40, 0));
 
     [Obsolete("Switch to the overload with the 'shouldCachePage' argument!")]
-    public static REPOPopupPage CreateREPOPopupPage(string headerText, bool pageDimmerVisibility = false, float spacing = 0, Vector2? localPosition = null) => CreateREPOPopupPage(headerText, pageDimmerVisibility, false, spacing, localPosition);
+    public static REPOPopupPage CreateREPOPopupPage(string headerText, bool pageDimmerVisibility = false, float spacing = 0, Vector2? localPosition = null) => CreateREPOPopupPage(headerText, false, pageDimmerVisibility, spacing, localPosition);
 
-    public static REPOPopupPage CreateREPOPopupPage(string headerText, REPOPopupPage.PresetSide presetSide, bool pageDimmerVisibility = false, bool shouldCachePage = false, float spacing = 0) => CreateREPOPopupPage(headerText, pageDimmerVisibility, shouldCachePage, spacing, presetSide == REPOPopupPage.PresetSide.Left ? null : new Vector2(40, 0));
+    public static REPOPopupPage CreateREPOPopupPage(string headerText, REPOPopupPage.PresetSide presetSide, bool shouldCachePage, bool pageDimmerVisibility, float spacing = 0) => CreateREPOPopupPage(headerText, pageDimmerVisibility, shouldCachePage, spacing, presetSide == REPOPopupPage.PresetSide.Left ? null : new Vector2(40, 0));
 
-    public static REPOPopupPage CreateREPOPopupPage(string headerText, bool pageDimmerVisibility = false, bool shouldCachePage = false, float spacing = 0, Vector2? localPosition = null)
+    public static REPOPopupPage CreateREPOPopupPage(string headerText, bool shouldCachePage, bool pageDimmerVisibility, float spacing = 0, Vector2? localPosition = null)
     {
         var newRectTransform = Object.Instantiate(REPOTemplates.popupPageTemplate, MenuHolder.instance.transform);
         newRectTransform.name = $"Menu Page {headerText}";
@@ -226,8 +226,8 @@ public static class MenuAPI
 
         repoPopupPage.rectTransform.localPosition = localPosition ?? new Vector2(-280, 0);
         repoPopupPage.headerTMP.text = headerText;
-        repoPopupPage.pageDimmerVisibility = pageDimmerVisibility;
         repoPopupPage.isCachedPage = shouldCachePage;
+        repoPopupPage.pageDimmerVisibility = pageDimmerVisibility;
         repoPopupPage.scrollView.spacing = spacing;
         
         customMenuPages.Add(repoPopupPage.menuPage, repoPopupPage);
