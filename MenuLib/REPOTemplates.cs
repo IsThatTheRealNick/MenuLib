@@ -4,14 +4,14 @@ namespace MenuLib;
 
 internal static class REPOTemplates
 {
-    internal static readonly RectTransform pageDimmerTemplate;
-    internal static readonly RectTransform simplePageTemplate;
-    internal static readonly RectTransform buttonTemplate;
-    internal static readonly RectTransform popupPageTemplate;
-    internal static readonly RectTransform toggleTemplate;
-    internal static readonly RectTransform sliderTemplate;
-    internal static readonly RectTransform keybindTemplate;
-    internal static readonly RectTransform labelTemplate;
+    internal static readonly RectTransform pageDimmerTemplate,
+        simplePageTemplate,
+        buttonTemplate,
+        popupPageTemplate,
+        toggleTemplate,
+        sliderTemplate,
+        labelTemplate,
+        avatarPreviewTemplate;
 
     static REPOTemplates()
     {
@@ -48,9 +48,12 @@ internal static class REPOTemplates
                 }
                 case MenuPageIndex.SettingsControls:
                 {
-                    var scroller = menuPageTransform.Find("Scroll Box/Mask/Scroller");
-                    keybindTemplate = (RectTransform) scroller.Find("Big Button move forward");
-                    labelTemplate = (RectTransform) scroller.Find("Header Movement");
+                    labelTemplate = (RectTransform) menuPageTransform.Find("Scroll Box/Mask/Scroller").Find("Header Movement");
+                    break;
+                }
+                case MenuPageIndex.Escape:
+                {
+                    avatarPreviewTemplate = (RectTransform) menuPageTransform.Find("Menu Element Player Avatar");
                     break;
                 }
             }
