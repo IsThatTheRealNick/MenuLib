@@ -1,5 +1,4 @@
-﻿using System;
-using MenuLib.Structs;
+﻿using MenuLib.Structs;
 using TMPro;
 using UnityEngine;
 
