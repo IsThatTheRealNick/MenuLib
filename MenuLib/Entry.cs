@@ -6,6 +6,7 @@ using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace MenuLib
 {
@@ -33,7 +34,7 @@ namespace MenuLib
             orig.Invoke(self);
             MenuAPI.lobbyMenuBuilderDelegate?.Invoke(self.transform);
         }
-
+        
         private static void SemiFunc_UIMouseHoverILHook(ILContext il)
         {
             var cursor = new ILCursor(il);
@@ -62,6 +63,31 @@ namespace MenuLib
 
             cursor.MarkLabel(jumpToLabel);
         }
+
+        private static void MenuPage_StateClosingILHook(ILContext il)
+        {
+            var cursor = new ILCursor(il);
+
+            cursor.GotoNext(instruction => instruction.MatchCall<Object>("Destroy"));
+
+            cursor.Index -= 5;
+            cursor.RemoveRange(6);
+
+            cursor.Emit(OpCodes.Ldarg_0);
+            cursor.EmitDelegate((MenuPage menuPage) =>
+            {
+                if (!MenuAPI.cachedMenuPages.Contains(menuPage))
+                {
+                    MenuManager.instance.PageRemove(menuPage);
+                    Destroy(menuPage.gameObject);
+                }
+                else
+                {
+                    menuPage.gameObject.SetActive(false);
+                    menuPage.PageStateSet(MenuPage.PageState.Opening);
+                }
+            });
+        }
         
         private void Awake()
         {
@@ -76,6 +102,9 @@ namespace MenuLib
             
             logger.LogDebug("Hooking `SemiFunc.UIMouseHover`");
             new ILHook(AccessTools.Method(typeof(SemiFunc), "UIMouseHover"), SemiFunc_UIMouseHoverILHook);
+            
+            logger.LogDebug("Hooking `MenuPage.StateClosing`");
+            new ILHook(AccessTools.Method(typeof(MenuPage), "StateClosing"), MenuPage_StateClosingILHook);
         }
     }
 }

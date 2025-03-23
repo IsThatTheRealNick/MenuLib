@@ -11,17 +11,19 @@ namespace MenuLib;
 
 public static class MenuAPI
 {
-    internal static BuilderDelegate mainMenuBuilderDelegates, escapeMenuBuilderDelegates, lobbyMenuBuilderDelegate;
+    internal static BuilderDelegate mainMenuBuilderDelegates, lobbyMenuBuilderDelegate, escapeMenuBuilderDelegates;
 
+    internal static readonly List<MenuPage> cachedMenuPages = [];
+    
     private static MenuButtonPopUp menuButtonPopup;
     
     public delegate void BuilderDelegate(Transform parent);
     
     public static void AddElementToMainMenu(BuilderDelegate builderDelegate) => mainMenuBuilderDelegates += builderDelegate;
     
-    public static void AddElementToEscapeMenu(BuilderDelegate builderDelegate) => escapeMenuBuilderDelegates += builderDelegate;
-    
     public static void AddElementToLobbyMenu(BuilderDelegate builderDelegate) => lobbyMenuBuilderDelegate += builderDelegate;
+    
+    public static void AddElementToEscapeMenu(BuilderDelegate builderDelegate) => escapeMenuBuilderDelegates += builderDelegate;
 
     public static void CloseAllPagesAddedOnTop() => MenuManager.instance.PageCloseAllAddedOnTop();
     
@@ -53,9 +55,7 @@ public static class MenuAPI
         var repoButton = newRectTransform.gameObject.AddComponent<REPOButton>();
 
         repoButton.labelTMP.text = text;
-        
-        if (onClick != null)
-            repoButton.button.onClick.AddListener(new UnityAction(onClick));
+        repoButton.onClick = onClick;
         
         return repoButton;
     }
@@ -204,8 +204,10 @@ public static class MenuAPI
         return repoSpacer;
     }
     
+    [Obsolete("Switch to the overload with the 'shouldCachePage' argument!")]
     public static REPOPopupPage CreateREPOPopupPage(string headerText, REPOPopupPage.PresetSide presetSide, bool pageDimmerVisibility = false, float spacing = 0) => CreateREPOPopupPage(headerText, pageDimmerVisibility, spacing, presetSide == REPOPopupPage.PresetSide.Left ? null : new Vector2(40, 0));
-    
+
+    [Obsolete("Switch to the overload with the 'shouldCachePage' argument!")]
     public static REPOPopupPage CreateREPOPopupPage(string headerText, bool pageDimmerVisibility = false, float spacing = 0, Vector2? localPosition = null)
     {
         var newRectTransform = Object.Instantiate(REPOTemplates.popupPageTemplate, MenuHolder.instance.transform);
@@ -221,8 +223,26 @@ public static class MenuAPI
         
         return repoPopupPage;
     }
-
-    internal static void OpenPage(MenuPage menuPage, bool pageOnTop)
+    
+    public static REPOPopupPage CreateREPOPopupPage(string headerText, REPOPopupPage.PresetSide presetSide, bool pageDimmerVisibility = false, bool shouldCachePage = false, float spacing = 0) => CreateREPOPopupPage(headerText, pageDimmerVisibility, shouldCachePage, spacing, presetSide == REPOPopupPage.PresetSide.Left ? null : new Vector2(40, 0));
+    
+    public static REPOPopupPage CreateREPOPopupPage(string headerText, bool pageDimmerVisibility = false, bool shouldCachePage = false, float spacing = 0, Vector2? localPosition = null)
+    {
+        var newRectTransform = Object.Instantiate(REPOTemplates.popupPageTemplate, MenuHolder.instance.transform);
+        newRectTransform.name = $"Menu Page {headerText}";
+        
+        var repoPopupPage = newRectTransform.gameObject.AddComponent<REPOPopupPage>();
+        
+        repoPopupPage.rectTransform.localPosition = localPosition ?? new Vector2(-280, 0);
+        repoPopupPage.headerTMP.text = headerText;
+        repoPopupPage.pageDimmerVisibility = pageDimmerVisibility;
+        repoPopupPage.cachedPage = shouldCachePage;
+        repoPopupPage.scrollView.spacing = spacing;
+        
+        return repoPopupPage;
+    }
+    
+    internal static void OpenMenuPage(MenuPage menuPage, bool pageOnTop)
     {
         var currentMenuPage = REPOReflection.menuManager_CurrentMenuPage.GetValue(MenuManager.instance) as MenuPage;
 
@@ -237,12 +257,16 @@ public static class MenuAPI
                 currentMenuPage?.PageStateSet(MenuPage.PageState.Inactive);
                 break;
         }
+
+        if (cachedMenuPages.Contains(menuPage))
+            menuPage.PageStateSet(MenuPage.PageState.Opening);
         
-        menuPage.gameObject.SetActive(true);
-        menuPage.transform.localPosition = Vector3.zero;
+        if (!menuPage.gameObject.activeSelf)
+            menuPage.gameObject.SetActive(true);
+        
         MenuManager.instance.PageAdd(menuPage);
         menuPage.StartCoroutine(REPOReflection.menuPage_LateStart.Invoke(menuPage, null) as IEnumerator);
-            
+
         REPOReflection.menuPage_AddedPageOnTop.SetValue(menuPage, false);
         
         if (!pageOnTop)
@@ -256,5 +280,16 @@ public static class MenuAPI
         
         REPOReflection.menuPage_ParentPage.SetValue(menuPage, currentMenuPage);
         addedPagesOnTop.Add(menuPage);
+    }
+
+    internal static void CloseMenuPage(MenuPage menuPage, bool closePagesAddedOnTop)
+    {
+        if (closePagesAddedOnTop)
+            CloseAllPagesAddedOnTop();
+        
+        menuPage.PageStateSet(MenuPage.PageState.Closing);
+        
+        if (REPOReflection.menuPage_PageUnderThisPage.GetValue(menuPage) is MenuPage parentPage)
+            MenuManager.instance.PageSetCurrent(parentPage.menuPageIndex, parentPage);
     }
 }

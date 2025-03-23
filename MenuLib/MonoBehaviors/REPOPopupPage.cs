@@ -1,4 +1,5 @@
-﻿using MenuLib.Structs;
+﻿using System;
+using MenuLib.Structs;
 using TMPro;
 using UnityEngine;
 
@@ -27,6 +28,21 @@ public sealed class REPOPopupPage : MonoBehaviour
         set => pageDimmerGameObject.gameObject.SetActive(value);
     }
 
+    public bool cachedPage
+    {
+        get => !repoCachedPage;
+        set
+        {
+            if (repoCachedPage && !value)
+                Destroy(repoCachedPage);
+            else if (!repoCachedPage && value)
+            {
+                repoCachedPage = gameObject.AddComponent<REPOCachedPage>();
+                menuPage.PageStateSet(MenuPage.PageState.Closing);
+            }
+        }
+    }
+    
     public Padding maskPadding
     {
         get => _maskPadding;
@@ -59,19 +75,12 @@ public sealed class REPOPopupPage : MonoBehaviour
 
     private Vector2 defaultMaskSizeDelta, defaultMaskPosition;
     private Padding _maskPadding;
+
+    private REPOCachedPage repoCachedPage;
     
-    public void OpenPage(bool openOnTop) => MenuAPI.OpenPage(menuPage, openOnTop);
-    
-    public void ClosePage(bool closePagesAddedOnTop)
-    {
-        if (closePagesAddedOnTop)
-            MenuAPI.CloseAllPagesAddedOnTop();
-        
-        menuPage.PageStateSet(MenuPage.PageState.Closing);
-        
-        if (REPOReflection.menuPage_PageUnderThisPage.GetValue(menuPage) is MenuPage parentPage)
-            MenuManager.instance.PageSetCurrent(parentPage.menuPageIndex, parentPage);
-    }
+    public void OpenPage(bool openOnTop) => MenuAPI.OpenMenuPage(menuPage, openOnTop);
+
+    public void ClosePage(bool closePagesAddedOnTop) => MenuAPI.CloseMenuPage(menuPage, closePagesAddedOnTop);
     
     public void AddElement(MenuAPI.BuilderDelegate builderDelegate) => builderDelegate?.Invoke(transform);
     
@@ -133,7 +142,6 @@ public sealed class REPOPopupPage : MonoBehaviour
 
         defaultMaskSizeDelta = maskRectTransform.sizeDelta;
         defaultMaskPosition = maskRectTransform.localPosition;
-       
 
         menuScrollBox.scroller.sizeDelta = maskRectTransform.sizeDelta;
         

@@ -1,4 +1,5 @@
-﻿using TMPro;
+﻿using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -6,11 +7,15 @@ namespace MenuLib.MonoBehaviors;
 
 public sealed class REPOButton : REPOElement
 {
-    public Button button;
     public MenuButton menuButton;
 
     public TextMeshProUGUI labelTMP;
 
+    [Obsolete("Update the button clicked event using the 'onClick' field rather than through the button")]
+    public Button button;
+    
+    public Action onClick;
+    
     private string currentText;
     
     public Vector2 GetLabelSize() => labelTMP.GetPreferredValues(); 
@@ -23,6 +28,8 @@ public sealed class REPOButton : REPOElement
         labelTMP = GetComponentInChildren<TextMeshProUGUI>();
         
         button.onClick = new Button.ButtonClickedEvent();
+        button.onClick.AddListener(() => onClick?.Invoke());
+        
         Destroy(GetComponent<MenuButtonPopUp>());
     }
 

@@ -8,8 +8,8 @@ public sealed class REPOScrollView : MonoBehaviour
     public REPOPopupPage popupPage;
 
     public float spacing;
-
-    private REPOScrollViewElement[] scrollViewElements = [];
+    
+    internal REPOScrollViewElement[] scrollViewElements = [];
     
     public void UpdateElements()
     {
