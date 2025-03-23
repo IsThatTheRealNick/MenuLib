@@ -5,7 +5,7 @@ namespace MenuLib.MonoBehaviors;
 
 public sealed class REPOLabel : REPOElement
 {
-    public TextMeshProUGUI labelTMP { get; private set; }
+    public TextMeshProUGUI labelTMP;
     
     private void Awake()
     {

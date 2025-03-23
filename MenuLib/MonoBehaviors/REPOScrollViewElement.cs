@@ -5,7 +5,7 @@ namespace MenuLib.MonoBehaviors;
 
 public sealed class REPOScrollViewElement : MonoBehaviour
 {
-    public RectTransform rectTransform { get; private set; }
+    public RectTransform rectTransform;
     
     public float topPadding
     {

@@ -15,11 +15,11 @@ public sealed class REPOSlider : REPOElement
         StaticAtMinimum,
         StaticAtMaximum
     }
-    
-    public TextMeshProUGUI labelTMP { get; private set; }
-    public TextMeshProUGUI descriptionTMP { get; private set; }
 
-    public REPOTextScroller repoTextScroller { get; private set; }
+    public TextMeshProUGUI labelTMP;
+    public TextMeshProUGUI descriptionTMP;
+
+    public REPOTextScroller repoTextScroller;
     
     public Action<float> onValueChanged;
 

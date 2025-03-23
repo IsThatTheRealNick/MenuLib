@@ -1,5 +1,4 @@
 ﻿using System;
-using MenuLib.MonoBehaviors;
 using TMPro;
 using UnityEngine;
 using Button = UnityEngine.UI.Button;
@@ -8,11 +7,9 @@ namespace MenuLib.MonoBehaviors;
 
 public sealed class REPOToggle : REPOElement
 {
-    private static readonly Vector3 leftPosition = new(137.8f, 12.3f), leftScale = new(73f, 22f, 1f), rightPosition = new(212.644f, 12.3f), rightScale = new(74f, 22f, 1f);
-    
-    public TextMeshProUGUI labelTMP { get; private set; }
-    public TextMeshProUGUI leftButtonTMP { get; private set; }
-    public TextMeshProUGUI rightButtonTMP { get; private set; }
+    public TextMeshProUGUI labelTMP;
+    public TextMeshProUGUI leftButtonTMP;
+    public TextMeshProUGUI rightButtonTMP;
 
     public Action<bool> onToggle;
     
@@ -23,8 +20,8 @@ public sealed class REPOToggle : REPOElement
     
     public void SetState(bool newState, bool invokeCallback)
     {
-        targetPosition = newState ? leftPosition : rightPosition;
-        targetScale = newState ? leftScale : rightScale;
+        targetPosition = newState ? new Vector3(137.8f, 12.3f) : new Vector3(212.644f, 12.3f);
+        targetScale = newState ? new Vector3(73f, 22f, 1f) : new Vector3(74f, 22f, 1f);
         
         if (invokeCallback && state != newState)
             onToggle?.Invoke(newState);

@@ -7,12 +7,12 @@ namespace MenuLib.MonoBehaviors;
 
 public sealed class REPOButton : REPOElement
 {
-    public MenuButton menuButton { get; private set; }
+    public MenuButton menuButton;
 
-    public TextMeshProUGUI labelTMP { get; private set; }
+    public TextMeshProUGUI labelTMP;
 
     [Obsolete("Update the button clicked event using the 'onClick' field rather than through the button")]
-    public Button button { get; private set; }
+    public Button button;
     
     public Action onClick;
     

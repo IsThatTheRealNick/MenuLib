@@ -10,15 +10,17 @@ public sealed class REPOAvatarPreview : REPOElement
         get => backgroundImage.enabled;
         set => backgroundImage.enabled = value;
     }
+
     public Color backgroundImageColor
     {
         get => backgroundImage.color;
         set => backgroundImage.color = value;
     }
-    
-    private Image backgroundImage;
 
+    public PlayerAvatarVisuals playerAvatarVisuals { get; private set; }
+    
     private PlayerAvatarMenu playerAvatarMenu;
+    private Image backgroundImage;
     
     private void Awake()
     {
@@ -28,6 +30,7 @@ public sealed class REPOAvatarPreview : REPOElement
         rectTransform.sizeDelta = new Vector2(184f, 345f);
 
         playerAvatarMenu = GetComponentInChildren<PlayerAvatarMenuHover>().playerAvatarMenu;
+        playerAvatarVisuals = playerAvatarMenu.GetComponentInChildren<PlayerAvatarVisuals>();
         
         backgroundImage = gameObject.AddComponent<Image>();
         backgroundImage.enabled = false;
