@@ -76,16 +76,12 @@ namespace MenuLib
             cursor.Emit(OpCodes.Ldarg_0);
             cursor.EmitDelegate((MenuPage menuPage) =>
             {
-                if (!MenuAPI.cachedMenuPages.Contains(menuPage))
-                {
-                    MenuManager.instance.PageRemove(menuPage);
-                    Destroy(menuPage.gameObject);
-                }
-                else
-                {
-                    menuPage.gameObject.SetActive(false);
-                    menuPage.PageStateSet(MenuPage.PageState.Opening);
-                }
+                
+                if (MenuAPI.customMenuPages.TryGetValue(menuPage, out var repoPopupPage) && repoPopupPage.cachedPage)
+                    return;
+                
+                MenuManager.instance.PageRemove(menuPage);
+                Destroy(menuPage.gameObject);
             });
         }
         

@@ -1,4 +1,5 @@
-﻿using MenuLib.Structs;
+﻿using System;
+using MenuLib.Structs;
 using TMPro;
 using UnityEngine;
 
@@ -28,20 +29,7 @@ public sealed class REPOPopupPage : MonoBehaviour
         set => pageDimmerGameObject.gameObject.SetActive(value);
     }
 
-    public bool cachedPage
-    {
-        get => !repoCachedPage;
-        set
-        {
-            if (repoCachedPage && !value)
-                Destroy(repoCachedPage);
-            else if (!repoCachedPage && value)
-            {
-                repoCachedPage = gameObject.AddComponent<REPOCachedPage>();
-                menuPage.PageStateSet(MenuPage.PageState.Closing);
-            }
-        }
-    }
+    public bool cachedPage;
     
     public Padding maskPadding
     {
@@ -76,8 +64,6 @@ public sealed class REPOPopupPage : MonoBehaviour
     private Vector2 defaultMaskSizeDelta, defaultMaskPosition;
     private Padding _maskPadding;
 
-    private REPOCachedPage repoCachedPage;
-    
     public void OpenPage(bool openOnTop) => MenuAPI.OpenMenuPage(menuPage, openOnTop);
 
     public void ClosePage(bool closePagesAddedOnTop) => MenuAPI.CloseMenuPage(menuPage, closePagesAddedOnTop);
@@ -152,7 +138,27 @@ public sealed class REPOPopupPage : MonoBehaviour
         maskPadding = new Padding(0, 0, 0, 25);
         
         Destroy(GetComponent<MenuPageSettingsPage>());
-        gameObject.AddComponent<MenuPageSettings>();
+    }
+    
+    private void Start()
+    {
+        REPOReflection.menuScrollBox_scrollerEndPosition.SetValue(menuScrollBox, 0);
+        menuScrollBox.scroller.localPosition = menuScrollBox.scroller.localPosition with { y = 0 };
+        
+        REPOReflection.menuPage_ScrollBoxes.SetValue(menuPage, 2);
+        
+        if (cachedPage)
+            menuPage.PageStateSet(MenuPage.PageState.Closing);
+    }
+
+    private void Update()
+    {
+        var pageState = (MenuPage.PageState) REPOReflection.menuPage_currentPageState.GetValue(menuPage);
+        
+        if (!SemiFunc.InputDown(InputKey.Back) || pageState == MenuPage.PageState.Closing)
+            return;
+        
+        ClosePage(false);
     }
 
     private void UpdateScrollBarPosition()
@@ -167,13 +173,5 @@ public sealed class REPOPopupPage : MonoBehaviour
         menuScrollBox.scrollBarBackground.sizeDelta = scrollBarFillRectTransform.sizeDelta = scrollBarRectTransform.sizeDelta = scrollBarSize;
 
         scrollBarOutlineRectTransform.sizeDelta = scrollBarSize + new Vector2(4f, 4f);
-    }
-    
-    private void Start()
-    {
-        REPOReflection.menuScrollBox_scrollerEndPosition.SetValue(menuScrollBox, 0);
-        menuScrollBox.scroller.localPosition = menuScrollBox.scroller.localPosition with { y = 0 };
-        
-        REPOReflection.menuPage_ScrollBoxes.SetValue(menuPage, 2);
     }
 }

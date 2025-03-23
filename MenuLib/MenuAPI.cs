@@ -13,7 +13,7 @@ public static class MenuAPI
 {
     internal static BuilderDelegate mainMenuBuilderDelegates, lobbyMenuBuilderDelegate, escapeMenuBuilderDelegates;
 
-    internal static readonly List<MenuPage> cachedMenuPages = [];
+    internal static readonly Dictionary<MenuPage, REPOPopupPage> customMenuPages = [];
 
     private static MenuButtonPopUp menuButtonPopup;
 
@@ -30,8 +30,7 @@ public static class MenuAPI
 
     public static void CloseAllPagesAddedOnTop() => MenuManager.instance.PageCloseAllAddedOnTop();
 
-    public static void OpenPopup(string header, Color headerColor, string content, Action onLeftClicked,
-        Action onRightClicked = null)
+    public static void OpenPopup(string header, Color headerColor, string content, Action onLeftClicked, Action onRightClicked = null)
     {
         if (!menuButtonPopup)
             menuButtonPopup = MenuManager.instance.gameObject.AddComponent<MenuButtonPopUp>();
@@ -214,21 +213,7 @@ public static class MenuAPI
     public static REPOPopupPage CreateREPOPopupPage(string headerText, REPOPopupPage.PresetSide presetSide, bool pageDimmerVisibility = false, float spacing = 0) => CreateREPOPopupPage(headerText, pageDimmerVisibility, spacing, presetSide == REPOPopupPage.PresetSide.Left ? null : new Vector2(40, 0));
 
     [Obsolete("Switch to the overload with the 'shouldCachePage' argument!")]
-    public static REPOPopupPage CreateREPOPopupPage(string headerText, bool pageDimmerVisibility = false, float spacing = 0, Vector2? localPosition = null)
-    {
-        var newRectTransform = Object.Instantiate(REPOTemplates.popupPageTemplate, MenuHolder.instance.transform);
-        newRectTransform.name = $"Menu Page {headerText}";
-
-        var repoPopupPage = newRectTransform.gameObject.AddComponent<REPOPopupPage>();
-
-        repoPopupPage.rectTransform.localPosition = localPosition ?? new Vector2(-280, 0);
-        repoPopupPage.pageDimmerVisibility = pageDimmerVisibility;
-        repoPopupPage.headerTMP.text = headerText;
-
-        repoPopupPage.scrollView.spacing = spacing;
-
-        return repoPopupPage;
-    }
+    public static REPOPopupPage CreateREPOPopupPage(string headerText, bool pageDimmerVisibility = false, float spacing = 0, Vector2? localPosition = null) => CreateREPOPopupPage(headerText, pageDimmerVisibility, false, spacing, localPosition);
 
     public static REPOPopupPage CreateREPOPopupPage(string headerText, REPOPopupPage.PresetSide presetSide, bool pageDimmerVisibility = false, bool shouldCachePage = false, float spacing = 0) => CreateREPOPopupPage(headerText, pageDimmerVisibility, shouldCachePage, spacing, presetSide == REPOPopupPage.PresetSide.Left ? null : new Vector2(40, 0));
 
@@ -244,7 +229,8 @@ public static class MenuAPI
         repoPopupPage.pageDimmerVisibility = pageDimmerVisibility;
         repoPopupPage.cachedPage = shouldCachePage;
         repoPopupPage.scrollView.spacing = spacing;
-
+        
+        customMenuPages.Add(repoPopupPage.menuPage, repoPopupPage);
         return repoPopupPage;
     }
 
@@ -261,31 +247,30 @@ public static class MenuAPI
         
         return repoAvatarPreview;
     }
-
+    
     internal static void OpenMenuPage(MenuPage menuPage, bool pageOnTop)
     {
         var currentMenuPage = REPOReflection.menuManager_CurrentMenuPage.GetValue(MenuManager.instance) as MenuPage;
-
-        var addedPagesOnTop = REPOReflection.menuManager_AddedPagesOnTop.GetValue(MenuManager.instance) as List<MenuPage>; 
+        
+        var addedPagesOnTop = REPOReflection.menuManager_AddedPagesOnTop.GetValue(MenuManager.instance) as List<MenuPage>;
+        
+        if (pageOnTop && !currentMenuPage)
+            pageOnTop = false;
         
         switch (pageOnTop)
         {
             case true when addedPagesOnTop == null || addedPagesOnTop.Contains(currentMenuPage):
                 return;
-            case false:
+            case false when currentMenuPage:
                 REPOReflection.menuManager_PageInactiveAdd.Invoke(MenuManager.instance, [ currentMenuPage ]);
-                currentMenuPage?.PageStateSet(MenuPage.PageState.Inactive);
+                currentMenuPage.PageStateSet(MenuPage.PageState.Inactive);
                 break;
         }
-
-        if (cachedMenuPages.Contains(menuPage))
-        {
-            menuPage.PageStateSet(MenuPage.PageState.Opening);
-            menuPage.transform.SetAsLastSibling();
-        }
         
-        if (!menuPage.gameObject.activeSelf)
-            menuPage.gameObject.SetActive(true);
+        menuPage.transform.SetAsLastSibling();
+        
+        menuPage.ResetPage();
+        menuPage.PageStateSet(MenuPage.PageState.Opening);
         
         MenuManager.instance.PageAdd(menuPage);
         menuPage.StartCoroutine(REPOReflection.menuPage_LateStart.Invoke(menuPage, null) as IEnumerator);
