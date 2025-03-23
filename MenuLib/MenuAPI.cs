@@ -227,7 +227,7 @@ public static class MenuAPI
         repoPopupPage.rectTransform.localPosition = localPosition ?? new Vector2(-280, 0);
         repoPopupPage.headerTMP.text = headerText;
         repoPopupPage.pageDimmerVisibility = pageDimmerVisibility;
-        repoPopupPage.cachedPage = shouldCachePage;
+        repoPopupPage.isCachedPage = shouldCachePage;
         repoPopupPage.scrollView.spacing = spacing;
         
         customMenuPages.Add(repoPopupPage.menuPage, repoPopupPage);

@@ -77,7 +77,7 @@ namespace MenuLib
             cursor.EmitDelegate((MenuPage menuPage) =>
             {
                 
-                if (MenuAPI.customMenuPages.TryGetValue(menuPage, out var repoPopupPage) && repoPopupPage.cachedPage)
+                if (MenuAPI.customMenuPages.TryGetValue(menuPage, out var repoPopupPage) && repoPopupPage.isCachedPage)
                     return;
                 
                 MenuManager.instance.PageRemove(menuPage);

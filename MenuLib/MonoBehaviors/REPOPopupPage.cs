@@ -1,5 +1,4 @@
-﻿using System;
-using MenuLib.Structs;
+﻿using MenuLib.Structs;
 using TMPro;
 using UnityEngine;
 
@@ -29,7 +28,7 @@ public sealed class REPOPopupPage : MonoBehaviour
         set => pageDimmerGameObject.gameObject.SetActive(value);
     }
 
-    public bool cachedPage;
+    public bool isCachedPage { get; internal set; }
     
     public Padding maskPadding
     {
@@ -147,7 +146,7 @@ public sealed class REPOPopupPage : MonoBehaviour
         
         REPOReflection.menuPage_ScrollBoxes.SetValue(menuPage, 2);
         
-        if (cachedPage)
+        if (isCachedPage)
             menuPage.PageStateSet(MenuPage.PageState.Closing);
     }
 
