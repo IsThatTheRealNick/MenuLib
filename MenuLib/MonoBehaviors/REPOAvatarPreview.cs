@@ -18,6 +18,8 @@ public sealed class REPOAvatarPreview : REPOElement
     }
 
     public PlayerAvatarVisuals playerAvatarVisuals { get; private set; }
+
+    public Transform rigTransform => playerAvatarVisuals.meshParent.transform;
     
     private PlayerAvatarMenu playerAvatarMenu;
     private Image backgroundImage;
