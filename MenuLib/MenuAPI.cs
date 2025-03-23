@@ -211,8 +211,7 @@ public static class MenuAPI
     }
 
     [Obsolete("Switch to the overload with the 'shouldCachePage' argument!")]
-    public static REPOPopupPage CreateREPOPopupPage(string headerText, REPOPopupPage.PresetSide presetSide, bool pageDimmerVisibility = false, float spacing = 0) => CreateREPOPopupPage(headerText, pageDimmerVisibility,
-        spacing, presetSide == REPOPopupPage.PresetSide.Left ? null : new Vector2(40, 0));
+    public static REPOPopupPage CreateREPOPopupPage(string headerText, REPOPopupPage.PresetSide presetSide, bool pageDimmerVisibility = false, float spacing = 0) => CreateREPOPopupPage(headerText, pageDimmerVisibility, spacing, presetSide == REPOPopupPage.PresetSide.Left ? null : new Vector2(40, 0));
 
     [Obsolete("Switch to the overload with the 'shouldCachePage' argument!")]
     public static REPOPopupPage CreateREPOPopupPage(string headerText, bool pageDimmerVisibility = false, float spacing = 0, Vector2? localPosition = null)
@@ -263,7 +262,7 @@ public static class MenuAPI
         return repoAvatarPreview;
     }
 
-internal static void OpenMenuPage(MenuPage menuPage, bool pageOnTop)
+    internal static void OpenMenuPage(MenuPage menuPage, bool pageOnTop)
     {
         var currentMenuPage = REPOReflection.menuManager_CurrentMenuPage.GetValue(MenuManager.instance) as MenuPage;
 
