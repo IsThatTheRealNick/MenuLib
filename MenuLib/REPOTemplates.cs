@@ -10,8 +10,9 @@ internal static class REPOTemplates
         popupPageTemplate,
         toggleTemplate,
         sliderTemplate,
-        labelTemplate,
-        avatarPreviewTemplate;
+        labelTemplate;
+
+    internal static readonly Transform avatarPreviewTemplate;
 
     static REPOTemplates()
     {
@@ -53,7 +54,7 @@ internal static class REPOTemplates
                 }
                 case MenuPageIndex.Escape:
                 {
-                    avatarPreviewTemplate = (RectTransform) menuPageTransform.Find("Menu Element Player Avatar");
+                    avatarPreviewTemplate = menuPageTransform.Find("Menu Element Player Avatar");
                     break;
                 }
             }

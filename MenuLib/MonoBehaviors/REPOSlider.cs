@@ -16,9 +16,10 @@ public sealed class REPOSlider : REPOElement
         StaticAtMaximum
     }
     
-    public TextMeshProUGUI labelTMP, descriptionTMP;
+    public TextMeshProUGUI labelTMP { get; private set; }
+    public TextMeshProUGUI descriptionTMP { get; private set; }
 
-    public REPOTextScroller repoTextScroller;
+    public REPOTextScroller repoTextScroller { get; private set; }
     
     public Action<float> onValueChanged;
 

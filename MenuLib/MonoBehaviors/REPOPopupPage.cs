@@ -14,13 +14,14 @@ public sealed class REPOPopupPage : MonoBehaviour
  
     public delegate RectTransform ScrollViewBuilderDelegate(Transform scrollView);
 
-    public RectTransform rectTransform;
-    public RectTransform maskRectTransform, scrollBarRectTransform;
-    public MenuPage menuPage;
-    public TextMeshProUGUI headerTMP;
-    public MenuScrollBox menuScrollBox;
-    public REPOScrollView scrollView;
-    
+    public RectTransform rectTransform { get; private set; }
+    public RectTransform maskRectTransform { get; private set; }
+    public RectTransform scrollBarRectTransform { get; private set; }
+    public MenuPage menuPage { get; private set; }
+    public TextMeshProUGUI headerTMP { get; private set; }
+    public MenuScrollBox menuScrollBox { get; private set; }
+    public REPOScrollView scrollView { get; private set; }
+
     public bool pageDimmerVisibility
     {
         get => pageDimmerGameObject.gameObject.activeSelf;

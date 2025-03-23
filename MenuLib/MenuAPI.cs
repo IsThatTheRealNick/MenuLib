@@ -249,12 +249,18 @@ public static class MenuAPI
         return repoPopupPage;
     }
 
-    public static REPOAvatarPreview CreateREPOAvatarPreview(Transform parent, Vector2 localPosition = default)
+    public static REPOAvatarPreview CreateREPOAvatarPreview(Transform parent, Vector2 localPosition = default, bool enableBackgroundImage = false, Color? backgroundImageColor = null)
     {
-        var newRectTransform = Object.Instantiate(REPOTemplates.avatarPreviewTemplate, parent);
-        newRectTransform.name = "Player Avatar Preview";
+        var newTransform = Object.Instantiate(REPOTemplates.avatarPreviewTemplate, parent);
+        newTransform.name = "Player Avatar Preview";
 
-        return newRectTransform.gameObject.AddComponent<REPOAvatarPreview>();
+        var repoAvatarPreview = newTransform.gameObject.AddComponent<REPOAvatarPreview>();
+
+        repoAvatarPreview.rectTransform.localPosition = localPosition;
+        repoAvatarPreview.enableBackgroundImage = enableBackgroundImage;
+        repoAvatarPreview.backgroundImageColor = backgroundImageColor ?? Color.white;
+        
+        return repoAvatarPreview;
     }
 
 internal static void OpenMenuPage(MenuPage menuPage, bool pageOnTop)

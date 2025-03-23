@@ -1,24 +1,43 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.UI;
 
 namespace MenuLib.MonoBehaviors;
 
-// The template this component attatches to does not have a RectTransform by design,
-// so this class cannot extend REPOElement.
-public sealed class REPOAvatarPreview : MonoBehaviour
+public sealed class REPOAvatarPreview : REPOElement
 {
-    public PlayerAvatarMenu playerAvatarMenu { get; private set; }
-    public PlayerAvatarMenuHover playerAvatarMenuHover { get; private set; }
+    public bool enableBackgroundImage
+    {
+        get => backgroundImage.enabled;
+        set => backgroundImage.enabled = value;
+    }
+    public Color backgroundImageColor
+    {
+        get => backgroundImage.color;
+        set => backgroundImage.color = value;
+    }
+    
+    private Image backgroundImage;
 
+    private PlayerAvatarMenu playerAvatarMenu;
+    
     private void Awake()
     {
-        // This component holds the camera and
-        // moves itself out of the UI and into the root hiearchy.
-        playerAvatarMenu = this.GetComponentInChildren<PlayerAvatarMenu>();
+        rectTransform = gameObject.AddComponent<RectTransform>();
+        rectTransform.pivot = Vector2.right;
+        rectTransform.anchorMin = rectTransform.anchorMax = Vector2.zero;
+        rectTransform.sizeDelta = new Vector2(184f, 345f);
 
-        // This component holds the RenderTexture, and stays in the UI hiearchy.
-        playerAvatarMenuHover = this.GetComponentInChildren<PlayerAvatarMenuHover>();
+        playerAvatarMenu = GetComponentInChildren<PlayerAvatarMenuHover>().playerAvatarMenu;
+        
+        backgroundImage = gameObject.AddComponent<Image>();
+        backgroundImage.enabled = false;
+    }
+
+    private void Start() => rectTransform.GetChild(0).localPosition = Vector3.zero;
+
+    private void OnDestroy()
+    {
+        Destroy(playerAvatarMenu.cameraAndStuff.gameObject);
+        Destroy(playerAvatarMenu.gameObject);
     }
 }

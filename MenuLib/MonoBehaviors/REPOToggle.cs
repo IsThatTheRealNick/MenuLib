@@ -10,7 +10,9 @@ public sealed class REPOToggle : REPOElement
 {
     private static readonly Vector3 leftPosition = new(137.8f, 12.3f), leftScale = new(73f, 22f, 1f), rightPosition = new(212.644f, 12.3f), rightScale = new(74f, 22f, 1f);
     
-    public TextMeshProUGUI labelTMP, leftButtonTMP, rightButtonTMP;
+    public TextMeshProUGUI labelTMP { get; private set; }
+    public TextMeshProUGUI leftButtonTMP { get; private set; }
+    public TextMeshProUGUI rightButtonTMP { get; private set; }
 
     public Action<bool> onToggle;
     
