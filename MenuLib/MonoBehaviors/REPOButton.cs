@@ -15,8 +15,12 @@ public sealed class REPOButton : REPOElement
     public Button button;
     
     public Action onClick;
+
+    public Vector2? overrideButtonSize;
     
-    private string currentText;
+    private string previousText;
+    
+    private Vector2? previousOverrideButtonSize;
     
     public Vector2 GetLabelSize() => labelTMP.GetPreferredValues(); 
     
@@ -35,11 +39,13 @@ public sealed class REPOButton : REPOElement
 
     private void Update()
     {
-        if (labelTMP.text == currentText)
+        if (labelTMP.text == previousText && overrideButtonSize == previousOverrideButtonSize)
             return;
 
-        rectTransform.sizeDelta = GetLabelSize();
-        currentText = labelTMP.text;
+        rectTransform.sizeDelta = overrideButtonSize ?? GetLabelSize();
+        
+        previousText = labelTMP.text;
+        previousOverrideButtonSize = overrideButtonSize;
     }
     
     private void OnTransformParentChanged() => REPOReflection.menuButton_ParentPage.SetValue(menuButton, GetComponentInParent<MenuPage>());

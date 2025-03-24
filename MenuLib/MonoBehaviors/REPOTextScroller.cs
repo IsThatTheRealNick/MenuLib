@@ -38,4 +38,11 @@ public sealed class REPOTextScroller : MonoBehaviour
             yield return new WaitForSeconds(endWaitTime);
         }
     }
+
+    private void Awake()
+    {
+        if (!textMeshPro)
+            textMeshPro = GetComponent<TextMeshProUGUI>();
+
+    }
 }

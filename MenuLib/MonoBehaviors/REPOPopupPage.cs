@@ -64,17 +64,11 @@ public sealed class REPOPopupPage : MonoBehaviour
 
     private Vector2 defaultMaskSizeDelta, defaultMaskPosition;
     private Padding _maskPadding;
-
-    private bool isAwakeFrame, triedOpeningOnAwake;
-
+    
     public void OpenPage(bool openOnTop)
     {
         MenuAPI.OpenMenuPage(menuPage, openOnTop);
-
-        triedOpeningOnAwake = isAwakeFrame;
-        
-        if (triedOpeningOnAwake)
-            pageWasActivatedOnce = true;
+        pageWasActivatedOnce = true;
     }
 
     public void ClosePage(bool closePagesAddedOnTop) => MenuAPI.CloseMenuPage(menuPage, closePagesAddedOnTop);
@@ -111,7 +105,6 @@ public sealed class REPOPopupPage : MonoBehaviour
     
     private void Awake()
     {
-        isAwakeFrame = true;
         menuPage = GetComponent<MenuPage>();
         headerTMP = GetComponentInChildren<TextMeshProUGUI>();
         menuScrollBox = GetComponentInChildren<MenuScrollBox>();
@@ -154,19 +147,18 @@ public sealed class REPOPopupPage : MonoBehaviour
     
     private void Start()
     {
-        isAwakeFrame = false;
         REPOReflection.menuScrollBox_scrollerEndPosition.SetValue(menuScrollBox, 0);
         menuScrollBox.scroller.localPosition = menuScrollBox.scroller.localPosition with { y = 0 };
         
         REPOReflection.menuPage_ScrollBoxes.SetValue(menuPage, 2);
         
-        if (!triedOpeningOnAwake)
+        if (!pageWasActivatedOnce)
             menuPage.PageStateSet(MenuPage.PageState.Closing);
     }
 
     private void Update()
     {
-        var pageState = (MenuPage.PageState) REPOReflection.menuPage_currentPageState.GetValue(menuPage);
+        var pageState = (MenuPage.PageState) REPOReflection.menuPage_CurrentPageState.GetValue(menuPage);
         
         if (!SemiFunc.InputDown(InputKey.Back) || pageState == MenuPage.PageState.Closing)
             return;

@@ -215,7 +215,7 @@ public static class MenuAPI
     [Obsolete("Switch to the overload with the 'shouldCachePage' argument!")]
     public static REPOPopupPage CreateREPOPopupPage(string headerText, bool pageDimmerVisibility = false, float spacing = 0, Vector2? localPosition = null) => CreateREPOPopupPage(headerText, false, pageDimmerVisibility, spacing, localPosition);
 
-    public static REPOPopupPage CreateREPOPopupPage(string headerText, REPOPopupPage.PresetSide presetSide, bool shouldCachePage, bool pageDimmerVisibility = false, float spacing = 0) => CreateREPOPopupPage(headerText, pageDimmerVisibility, shouldCachePage, spacing, presetSide == REPOPopupPage.PresetSide.Left ? null : new Vector2(40, 0));
+    public static REPOPopupPage CreateREPOPopupPage(string headerText, REPOPopupPage.PresetSide presetSide, bool shouldCachePage, bool pageDimmerVisibility = false, float spacing = 0) => CreateREPOPopupPage(headerText, shouldCachePage, pageDimmerVisibility, spacing, presetSide == REPOPopupPage.PresetSide.Left ? null : new Vector2(40, 0));
 
     public static REPOPopupPage CreateREPOPopupPage(string headerText, bool shouldCachePage, bool pageDimmerVisibility = false, float spacing = 0, Vector2? localPosition = null)
     {
@@ -268,7 +268,8 @@ public static class MenuAPI
         }
         
         menuPage.transform.SetAsLastSibling();
-        
+
+        menuPage.enabled = true;
         menuPage.ResetPage();
         menuPage.PageStateSet(MenuPage.PageState.Opening);
         

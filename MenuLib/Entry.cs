@@ -35,15 +35,6 @@ namespace MenuLib
             MenuAPI.lobbyMenuBuilderDelegate?.Invoke(self.transform);
         }
         
-        private static void MenuPage_StateActiveHook(Action<MenuPage> orig, MenuPage self)
-        {
-            orig.Invoke(self);
-
-            if (MenuAPI.customMenuPages.TryGetValue(self, out var repoPopupPage))
-                repoPopupPage.pageWasActivatedOnce = true;
-
-        }
-        
         private static void SemiFunc_UIMouseHoverILHook(ILContext il)
         {
             var cursor = new ILCursor(il);
@@ -72,11 +63,29 @@ namespace MenuLib
 
             cursor.MarkLabel(jumpToLabel);
         }
-
+        
         private static void MenuPage_StateClosingILHook(ILContext il)
         {
             var cursor = new ILCursor(il);
 
+            cursor.GotoNext(instruction => instruction.MatchLdfld<MenuPage>("stateStart"));
+
+            cursor.Index += 2;
+            
+            cursor.Emit(OpCodes.Ldarg_0);
+            cursor.EmitDelegate((MenuPage menuPage) =>
+            {
+                if (!MenuAPI.customMenuPages.TryGetValue(menuPage, out var repoPopupPage))
+                    return;
+                
+                var rectTransform = (RectTransform) menuPage.transform;
+
+                var animateAwayPosition = (Vector2) rectTransform.position;
+                animateAwayPosition.y = -rectTransform.rect.height - repoPopupPage.rectTransform.rect.height;
+
+                REPOReflection.menuPage_AnimateAwayPosition.SetValue(menuPage, animateAwayPosition);
+            });
+            
             cursor.GotoNext(instruction => instruction.MatchCall<Object>("Destroy"));
 
             cursor.Index -= 5;
@@ -86,7 +95,10 @@ namespace MenuLib
             cursor.EmitDelegate((MenuPage menuPage) =>
             {
                 if (MenuAPI.customMenuPages.TryGetValue(menuPage, out var repoPopupPage) && (repoPopupPage.isCachedPage || !repoPopupPage.pageWasActivatedOnce))
+                {
+                    menuPage.enabled = false;
                     return;
+                }
                 
                 MenuManager.instance.PageRemove(menuPage);
                 Destroy(menuPage.gameObject);
@@ -103,9 +115,6 @@ namespace MenuLib
             
             logger.LogDebug("Hooking `MenuPageLobby.Start`");
             new Hook(AccessTools.Method(typeof(MenuPageLobby), "Start"), MenuPageLobby_StartHook);
-            
-            logger.LogDebug("Hooking `MenuPage.StateActive`");
-            new Hook(AccessTools.Method(typeof(MenuPage), "StateActive"), MenuPage_StateActiveHook);
             
             logger.LogDebug("Hooking `SemiFunc.UIMouseHover`");
             new ILHook(AccessTools.Method(typeof(SemiFunc), "UIMouseHover"), SemiFunc_UIMouseHoverILHook);
