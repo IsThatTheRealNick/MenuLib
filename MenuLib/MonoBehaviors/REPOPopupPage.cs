@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using MenuLib.Structs;
+﻿using MenuLib.Structs;
 using TMPro;
 using UnityEngine;
 
@@ -56,6 +55,8 @@ public sealed class REPOPopupPage : MonoBehaviour
             _maskPadding = value;
         }
     }
+
+    internal bool pageWasActivatedOnce;
     
     private GameObject pageDimmerGameObject;
 
@@ -64,14 +65,16 @@ public sealed class REPOPopupPage : MonoBehaviour
     private Vector2 defaultMaskSizeDelta, defaultMaskPosition;
     private Padding _maskPadding;
 
-    private bool fixedNonCachedPage;
+    private bool isAwakeFrame, triedOpeningOnAwake;
 
     public void OpenPage(bool openOnTop)
     {
         MenuAPI.OpenMenuPage(menuPage, openOnTop);
+
+        triedOpeningOnAwake = isAwakeFrame;
         
-        if (!isCachedPage)
-            fixedNonCachedPage = true;
+        if (triedOpeningOnAwake)
+            pageWasActivatedOnce = true;
     }
 
     public void ClosePage(bool closePagesAddedOnTop) => MenuAPI.CloseMenuPage(menuPage, closePagesAddedOnTop);
@@ -108,6 +111,7 @@ public sealed class REPOPopupPage : MonoBehaviour
     
     private void Awake()
     {
+        isAwakeFrame = true;
         menuPage = GetComponent<MenuPage>();
         headerTMP = GetComponentInChildren<TextMeshProUGUI>();
         menuScrollBox = GetComponentInChildren<MenuScrollBox>();
@@ -150,22 +154,14 @@ public sealed class REPOPopupPage : MonoBehaviour
     
     private void Start()
     {
+        isAwakeFrame = false;
         REPOReflection.menuScrollBox_scrollerEndPosition.SetValue(menuScrollBox, 0);
         menuScrollBox.scroller.localPosition = menuScrollBox.scroller.localPosition with { y = 0 };
         
         REPOReflection.menuPage_ScrollBoxes.SetValue(menuPage, 2);
-
-        if (isCachedPage)
-            menuPage.PageStateSet(MenuPage.PageState.Closing);
-        else
-            StartCoroutine(ResetMenuPage());
         
-        return;
-        IEnumerator ResetMenuPage()
-        {
-            yield return new WaitForSeconds(0.5f);
-            menuPage.ResetPage();
-        }
+        if (!triedOpeningOnAwake)
+            menuPage.PageStateSet(MenuPage.PageState.Closing);
     }
 
     private void Update()
