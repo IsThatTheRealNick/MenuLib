@@ -76,6 +76,8 @@ public sealed class REPOPopupPage : MonoBehaviour
     {
         MenuAPI.OpenMenuPage(menuPage, openOnTop);
         pageWasActivatedOnce = true;
+        
+        scrollView.UpdateElements();
     }
 
     public void ClosePage(bool closePagesAddedOnTop) => MenuAPI.CloseMenuPage(menuPage, closePagesAddedOnTop);
@@ -91,7 +93,7 @@ public sealed class REPOPopupPage : MonoBehaviour
     public void AddElementToScrollView(ScrollViewBuilderDelegate scrollViewBuilderDelegate, float topPadding = 0, float bottomPadding = 0)
     {
         if (scrollViewBuilderDelegate?.Invoke(menuScrollBox.scroller)?.gameObject.AddComponent<REPOScrollViewElement>() is not { } scrollViewElement) return;
-        
+
         scrollViewElement.onSettingChanged = scrollView.UpdateElements;
         scrollViewElement.topPadding = topPadding;
         scrollViewElement.bottomPadding = bottomPadding;
@@ -99,13 +101,14 @@ public sealed class REPOPopupPage : MonoBehaviour
     
     public void AddElementToScrollView(RectTransform elementRectTransform, Vector2 localPosition = default, float topPadding = 0, float bottomPadding = 0)
     {
-        elementRectTransform.SetParent(menuScrollBox.scroller);
-        elementRectTransform.localPosition = localPosition;
-
         if (elementRectTransform.gameObject.AddComponent<REPOScrollViewElement>() is not { } scrollViewElement)
             return;
         
         scrollViewElement.onSettingChanged = scrollView.UpdateElements;
+        
+        elementRectTransform.SetParent(menuScrollBox.scroller);
+        elementRectTransform.localPosition = localPosition;
+        
         scrollViewElement.topPadding = topPadding;
         scrollViewElement.bottomPadding = bottomPadding;
     }

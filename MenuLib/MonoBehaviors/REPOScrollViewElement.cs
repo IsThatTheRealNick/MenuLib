@@ -52,4 +52,6 @@ public sealed class REPOScrollViewElement : MonoBehaviour
     private float _topPadding, _bottomPadding;
     
     private void Awake() => rectTransform = transform as RectTransform;
+    
+    private void OnRectTransformDimensionsChange() => onSettingChanged?.Invoke();
 }
