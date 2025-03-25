@@ -42,6 +42,9 @@ public sealed class REPOAvatarPreview : REPOElement
 
     private void OnDestroy()
     {
+        if (!playerAvatarMenu?.cameraAndStuff)
+            return;
+        
         Destroy(playerAvatarMenu.cameraAndStuff.gameObject);
         Destroy(playerAvatarMenu.gameObject);
     }
