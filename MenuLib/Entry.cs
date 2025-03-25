@@ -109,10 +109,8 @@ namespace MenuLib
         {
             var cursor = new ILCursor(il);
 
-            cursor.GotoNext(instruction => instruction.MatchLdfld<MenuScrollBox>("scrollBoxActive"));
-
-            cursor.Index--;
-
+            cursor.GotoNext(instruction => instruction.MatchLdarg(0), instruction => instruction.MatchLdfld<MenuScrollBox>("scrollBoxActive"));
+            
             cursor.RemoveRange(4);
 
             var returnLabel = cursor.MarkLabel();
@@ -120,6 +118,25 @@ namespace MenuLib
             cursor.Index -= 2;
             cursor.Remove();
             cursor.Emit(OpCodes.Brtrue_S, returnLabel);
+
+            cursor.GotoNext(instruction => instruction.MatchCall(typeof(SemiFunc), "InputScrollY"));
+            
+            var postIfLabel = il.Instrs[cursor.Index + 2].Operand as ILLabel;
+
+            cursor.Index -= 3;
+            
+            var newLabel = cursor.MarkLabel();
+            cursor.Emit(OpCodes.Ldarg_0);
+            cursor.Emit(OpCodes.Ldfld, AccessTools.Field(typeof(MenuScrollBox), "scrollBoxActive"));
+            cursor.Emit(OpCodes.Brfalse_S, postIfLabel);
+
+            cursor.GotoPrev(MoveType.After, instruction => instruction.MatchCall<Input>("GetMouseButton"));
+            cursor.Remove();
+            cursor.Emit(OpCodes.Brfalse, newLabel);
+            
+            cursor.GotoNext(MoveType.After, instruction => instruction.MatchCall(typeof(SemiFunc), "UIMouseHover"));
+            cursor.Remove();
+            cursor.Emit(OpCodes.Brfalse, newLabel);
         }
         
         private void Awake()
