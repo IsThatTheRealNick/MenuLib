@@ -19,8 +19,10 @@ public sealed class REPOScrollView : MonoBehaviour
             UpdateElements();
         }
     }
+
+    public float? scrollSpeed;
     
-    internal REPOScrollViewElement[] scrollViewElements = [];
+    private REPOScrollViewElement[] scrollViewElements = [];
     
     private float _spacing;
     
@@ -38,14 +40,12 @@ public sealed class REPOScrollView : MonoBehaviour
             
             var localPosition = scrollViewElement.rectTransform.localPosition;
 
-            if (scrollViewElement.topPadding is { } topPadding)
-                yPosition -= topPadding;
+            yPosition -= scrollViewElement.topPadding;
             
             yPosition -= scrollViewElement.rectTransform.rect.height;
             lastElementYPosition = localPosition.y = yPosition;
-            
-            if (scrollViewElement.bottomPadding is { } bottomPadding)
-                yPosition -= bottomPadding;
+
+            yPosition -= scrollViewElement.bottomPadding;
 
             yPosition -= spacing;
 
@@ -68,6 +68,22 @@ public sealed class REPOScrollView : MonoBehaviour
         }
         
         REPOReflection.menuScrollBox_ScrollerStartPosition.SetValue(menuScrollBox, Math.Abs(lastElementYPosition / (1f - 0.55f * menuScrollBox.scrollHandle.rect.height / menuScrollBox.scrollBarBackground.rect.height)));
+    }
+
+    public void SetScrollPosition(float normalizedPosition)
+    {
+        normalizedPosition = Mathf.Clamp(1 - normalizedPosition, 0, 1);
+
+        var scrollBarHeight = popupPage.menuScrollBox.scrollBarBackground.rect.height;
+        var newHandlePosition = normalizedPosition * scrollBarHeight;
+        var handleExtent = popupPage.menuScrollBox.scrollHandle.sizeDelta.y / 2f;
+        
+        if (newHandlePosition < handleExtent)
+            newHandlePosition = handleExtent;
+        else if (newHandlePosition > scrollBarHeight - handleExtent)
+            newHandlePosition = scrollBarHeight - handleExtent;
+        
+        REPOReflection.menuScrollBox_ScrollHandleTargetPosition.SetValue(popupPage.menuScrollBox, newHandlePosition);
     }
     
     private void OnTransformChildrenChanged() => UpdateElements();

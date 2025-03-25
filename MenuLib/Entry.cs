@@ -121,13 +121,50 @@ namespace MenuLib
 
             cursor.GotoNext(instruction => instruction.MatchCall(typeof(SemiFunc), "InputScrollY"));
             
-            var postIfLabel = il.Instrs[cursor.Index + 2].Operand as ILLabel;
+            cursor.Index--;
+            cursor.Remove();
+            
+            var customScrollLogicLabel = cursor.DefineLabel();
+            cursor.Emit(OpCodes.Bne_Un_S, customScrollLogicLabel);
 
-            cursor.Index -= 3;
+            cursor.Index += 2;
+            
+            var postIfLabel = il.Instrs[cursor.Index].Operand as ILLabel;
+            
+            cursor.Index++;
+            cursor.RemoveRange(24);
+            cursor.MarkLabel(customScrollLogicLabel);
+            cursor.Emit(OpCodes.Ldarg_0);
+            cursor.Emit(OpCodes.Ldarg_0);
+            cursor.Emit<MenuScrollBox>(OpCodes.Ldfld, "parentPage");
+            cursor.EmitDelegate((MenuScrollBox menuScrollBox, MenuPage menuPage) => {
+                var yMovementInput = SemiFunc.InputMovementY();
+                var yMouseScroll = SemiFunc.InputScrollY();
+
+                float amountToScroll;
+
+                if (MenuAPI.customMenuPages.TryGetValue(menuPage, out var repoPopupPage) && repoPopupPage.scrollView.scrollSpeed is { } constantScrollSpeed)
+                {
+                    constantScrollSpeed *= 10f;
+                    
+                    var scrollableHeight = Mathf.Abs((float) REPOReflection.menuScrollBox_ScrollerEndPosition.GetValue(menuScrollBox) - (float) REPOReflection.menuScrollBox_ScrollerStartPosition.GetValue(menuScrollBox));
+                    amountToScroll = (yMovementInput + Math.Sign(yMouseScroll)) * constantScrollSpeed / scrollableHeight * menuScrollBox.scrollBarBackground.rect.height;
+                }
+                else
+                {
+                    var scrollHeight = (float) REPOReflection.menuScrollBox_ScrollHeight.GetValue(menuScrollBox);
+                    amountToScroll = yMovementInput * 20f / (scrollHeight * 0.01f) + yMouseScroll / (scrollHeight * 0.01f);
+                }
+             
+                var currentHandlePosition = (float) REPOReflection.menuScrollBox_ScrollHandleTargetPosition.GetValue(menuScrollBox);
+                REPOReflection.menuScrollBox_ScrollHandleTargetPosition.SetValue(menuScrollBox, currentHandlePosition + amountToScroll);
+            });
+            
+            cursor.GotoPrev(instruction => instruction.MatchCall(typeof(SemiFunc), "InputMovementY"));
             
             var newLabel = cursor.MarkLabel();
             cursor.Emit(OpCodes.Ldarg_0);
-            cursor.Emit(OpCodes.Ldfld, AccessTools.Field(typeof(MenuScrollBox), "scrollBoxActive"));
+            cursor.Emit<MenuScrollBox>(OpCodes.Ldfld, "scrollBoxActive");
             cursor.Emit(OpCodes.Brfalse_S, postIfLabel);
 
             cursor.GotoPrev(MoveType.After, instruction => instruction.MatchCall<Input>("GetMouseButton"));
