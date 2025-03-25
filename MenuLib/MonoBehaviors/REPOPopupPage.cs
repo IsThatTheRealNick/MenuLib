@@ -1,6 +1,7 @@
 ﻿using MenuLib.Structs;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace MenuLib.MonoBehaviors;
 
@@ -29,6 +30,12 @@ public sealed class REPOPopupPage : MonoBehaviour
     }
 
     public bool isCachedPage { get; internal set; }
+
+    public float pageDimmerOpacity
+    {
+        get => pageDimmerRawImage.color.a;
+        set => pageDimmerRawImage.color = pageDimmerRawImage.color with { a = value };
+    }
     
     public Padding maskPadding
     {
@@ -50,15 +57,15 @@ public sealed class REPOPopupPage : MonoBehaviour
             maskRectTransform.sizeDelta = sizeDelta;
             maskRectTransform.localPosition = position;
             
-            UpdateScrollBarPosition();
-            
             _maskPadding = value;
+            UpdateScrollBarPosition();
         }
     }
 
     internal bool pageWasActivatedOnce;
     
     private GameObject pageDimmerGameObject;
+    private RawImage pageDimmerRawImage;
 
     private RectTransform scrollBarFillRectTransform, scrollBarOutlineRectTransform;
 
@@ -118,6 +125,8 @@ public sealed class REPOPopupPage : MonoBehaviour
         
         pageDimmerGameObject = Instantiate(REPOTemplates.pageDimmerTemplate, transform).gameObject;
         pageDimmerGameObject.transform.SetAsFirstSibling();
+        
+        pageDimmerRawImage = pageDimmerGameObject.GetComponentInChildren<RawImage>();
 
         menuPage.menuPageIndex = (MenuPageIndex) (-1);
 
@@ -147,7 +156,7 @@ public sealed class REPOPopupPage : MonoBehaviour
     
     private void Start()
     {
-        REPOReflection.menuScrollBox_scrollerEndPosition.SetValue(menuScrollBox, 0);
+        REPOReflection.menuScrollBox_ScrollerEndPosition.SetValue(menuScrollBox, 0);
         menuScrollBox.scroller.localPosition = menuScrollBox.scroller.localPosition with { y = 0 };
         
         REPOReflection.menuPage_ScrollBoxes.SetValue(menuPage, 2);

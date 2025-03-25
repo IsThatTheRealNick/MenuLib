@@ -15,9 +15,9 @@ public static class REPOReflection
     public static readonly FieldInfo menuPage_CurrentPageState = AccessTools.Field(typeof(MenuPage), "currentPageState");
     public static readonly FieldInfo menuPage_AnimateAwayPosition = AccessTools.Field(typeof(MenuPage), "animateAwayPosition");
     public static readonly FieldInfo menuButton_ParentPage = AccessTools.Field(typeof(MenuButton), "parentPage");
-    public static readonly FieldInfo menuScrollBox_scrollerEndPosition = AccessTools.Field(typeof(MenuScrollBox), "scrollerEndPosition");
-    public static readonly FieldInfo menuScrollBox_scrollerStartPosition = AccessTools.Field(typeof(MenuScrollBox), "scrollerStartPosition");
-    public static readonly FieldInfo menuSelectableElement_menuID = AccessTools.Field(typeof(MenuSelectableElement), "menuID");
+    public static readonly FieldInfo menuScrollBox_ScrollerEndPosition = AccessTools.Field(typeof(MenuScrollBox), "scrollerEndPosition");
+    public static readonly FieldInfo menuScrollBox_ScrollerStartPosition = AccessTools.Field(typeof(MenuScrollBox), "scrollerStartPosition");
+    public static readonly FieldInfo menuSelectableElement_MenuID = AccessTools.Field(typeof(MenuSelectableElement), "menuID");
     public static readonly MethodInfo menuManager_PageInactiveAdd = AccessTools.Method(typeof(MenuManager), "PageInactiveAdd");
     public static readonly MethodInfo menuPage_LateStart = AccessTools.Method(typeof(MenuPage), "LateStart");
 }

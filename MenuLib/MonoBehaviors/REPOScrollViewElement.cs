@@ -15,9 +15,8 @@ public sealed class REPOScrollViewElement : MonoBehaviour
             if (Math.Abs(_topPadding - value) < float.Epsilon)
                 return;
             
-            onSettingChanged?.Invoke();
-            
             _topPadding = value;
+            onSettingChanged?.Invoke();
         }
     }
     public float bottomPadding
@@ -28,9 +27,8 @@ public sealed class REPOScrollViewElement : MonoBehaviour
             if (Math.Abs(_bottomPadding - value) < float.Epsilon)
                 return;
             
-            onSettingChanged?.Invoke();
-            
             _bottomPadding = value;
+            onSettingChanged?.Invoke();
         }
     }
     
@@ -42,9 +40,9 @@ public sealed class REPOScrollViewElement : MonoBehaviour
             if (_visibility == value)
                 return;
             
-            onSettingChanged?.Invoke();
-            gameObject.SetActive(value);
             _visibility = value;
+            gameObject.SetActive(value);
+            onSettingChanged?.Invoke();
         }
     }
 

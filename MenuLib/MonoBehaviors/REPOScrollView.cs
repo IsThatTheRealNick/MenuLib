@@ -7,9 +7,22 @@ public sealed class REPOScrollView : MonoBehaviour
 {
     public REPOPopupPage popupPage;
 
-    public float spacing;
+    public float spacing
+    {
+        get => _spacing;
+        set
+        {
+            if (Math.Abs(_spacing - value) < float.Epsilon)
+                return;
+            
+            _spacing = value;
+            UpdateElements();
+        }
+    }
     
     internal REPOScrollViewElement[] scrollViewElements = [];
+    
+    private float _spacing;
     
     public void UpdateElements()
     {
@@ -41,6 +54,7 @@ public sealed class REPOScrollView : MonoBehaviour
         
         var scrollBarGameObject = popupPage.scrollBarRectTransform.gameObject;
         var menuScrollBox = popupPage.menuScrollBox;
+        var scroller = menuScrollBox.scroller;
         
         switch (lastElementYPosition)
         {
@@ -49,14 +63,15 @@ public sealed class REPOScrollView : MonoBehaviour
                 break;
             case >= 0 when scrollBarGameObject.activeSelf:
                 popupPage.scrollBarRectTransform.gameObject.SetActive(false);
-                menuScrollBox.scroller.localPosition = menuScrollBox.scroller.localPosition with { y = 0 };
+                scroller.localPosition = scroller.localPosition with { y = 0 };
                 break;
         }
         
-        var divisor = 1f - menuScrollBox.scrollHandle.rect.height * .5f / menuScrollBox.scrollBarBackground.rect.height * 1.1f;
-        REPOReflection.menuScrollBox_scrollerStartPosition.SetValue(menuScrollBox, Math.Abs(lastElementYPosition/divisor));
+        REPOReflection.menuScrollBox_ScrollerStartPosition.SetValue(menuScrollBox, Math.Abs(lastElementYPosition / (1f - 0.55f * menuScrollBox.scrollHandle.rect.height / menuScrollBox.scrollBarBackground.rect.height)));
     }
-
+    
+    private void OnTransformChildrenChanged() => UpdateElements();
+    
     private void Update()
     {
         var maskRectTransform = popupPage.maskRectTransform;
@@ -82,6 +97,4 @@ public sealed class REPOScrollView : MonoBehaviour
             }   
         }
     }
-
-    private void OnTransformChildrenChanged() => UpdateElements();
 }

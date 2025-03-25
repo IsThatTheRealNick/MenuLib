@@ -194,7 +194,7 @@ public sealed class REPOSlider : REPOElement
     {
         HandleDescription();
         
-        var isHoveringUI = SemiFunc.UIMouseHover(menuPage, barSizeRectTransform, REPOReflection.menuSelectableElement_menuID.GetValue(menuSelectableElement) as string, 5f, 5f);
+        var isHoveringUI = SemiFunc.UIMouseHover(menuPage, barSizeRectTransform, REPOReflection.menuSelectableElement_MenuID.GetValue(menuSelectableElement) as string, 5f, 5f);
 
         if (isHoveringUI)
         {

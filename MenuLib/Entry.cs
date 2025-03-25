@@ -104,6 +104,23 @@ namespace MenuLib
                 Destroy(menuPage.gameObject);
             });
         }
+
+        private static void MenuScrollBox_UpdateILHook(ILContext il)
+        {
+            var cursor = new ILCursor(il);
+
+            cursor.GotoNext(instruction => instruction.MatchLdfld<MenuScrollBox>("scrollBoxActive"));
+
+            cursor.Index--;
+
+            cursor.RemoveRange(4);
+
+            var returnLabel = cursor.MarkLabel();
+
+            cursor.Index -= 2;
+            cursor.Remove();
+            cursor.Emit(OpCodes.Brtrue_S, returnLabel);
+        }
         
         private void Awake()
         {
@@ -121,6 +138,9 @@ namespace MenuLib
             
             logger.LogDebug("Hooking `MenuPage.StateClosing`");
             new ILHook(AccessTools.Method(typeof(MenuPage), "StateClosing"), MenuPage_StateClosingILHook);
+            
+            logger.LogDebug("Hooking `MenuScrollBox.Update`");
+            new ILHook(AccessTools.Method(typeof(MenuScrollBox), "Update"), MenuScrollBox_UpdateILHook);
         }
     }
 }
