@@ -10,7 +10,7 @@ using Object = UnityEngine.Object;
 
 namespace MenuLib
 {
-    [BepInPlugin("nickklmao.menulib", MOD_NAME, "2.1.1")]
+    [BepInPlugin("nickklmao.menulib", MOD_NAME, "2.1.2")]
     internal sealed class Entry : BaseUnityPlugin
     {
         private const string MOD_NAME = "Menu Lib";

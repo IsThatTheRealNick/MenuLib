@@ -71,7 +71,7 @@ public sealed class REPOScrollView : MonoBehaviour
     }
     
     private void OnTransformChildrenChanged() => UpdateElements();
-    
+
     private void Update()
     {
         var maskRectTransform = popupPage.maskRectTransform;
