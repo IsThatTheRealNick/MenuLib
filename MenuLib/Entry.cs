@@ -20,13 +20,25 @@ namespace MenuLib
         private static void MenuPageMain_StartHook(Action<MenuPageMain> orig, MenuPageMain self)
         {
             orig.Invoke(self);
-            MenuAPI.mainMenuBuilderDelegates?.Invoke(self.transform);
+            MenuAPI.mainMenuBuilderDelegate?.Invoke(self.transform);
+        }
+        
+        private static void MenuPageSettings_StartHook(Action<MenuPageSettings> orig, MenuPageSettings self)
+        {
+            orig.Invoke(self);
+            MenuAPI.settingsMenuBuilderDelegate?.Invoke(self.transform);
+        }
+        
+        private static void MenuPageColor_StartHook(Action<MenuPageColor> orig, MenuPageColor self)
+        {
+            orig.Invoke(self);
+            MenuAPI.colorMenuBuilderDelegate?.Invoke(self.transform);
         }
         
         private static void MenuPageEsc_StartHook(Action<MenuPageEsc> orig, MenuPageEsc self)
         {
             orig.Invoke(self);
-			MenuAPI.escapeMenuBuilderDelegates?.Invoke(self.transform);
+			MenuAPI.escapeMenuBuilderDelegate?.Invoke(self.transform);
         }
         
         private static void MenuPageLobby_StartHook(Action<MenuPageLobby> orig, MenuPageLobby self)
@@ -180,6 +192,12 @@ namespace MenuLib
         {
             logger.LogDebug("Hooking `MenuPageMain.Start`");
             new Hook(AccessTools.Method(typeof(MenuPageMain), "Start"), MenuPageMain_StartHook);
+            
+            logger.LogDebug("Hooking `MenuPageSettings.Start`");
+            new Hook(AccessTools.Method(typeof(MenuPageSettings), "Start"), MenuPageSettings_StartHook);
+            
+            logger.LogDebug("Hooking `MenuPageColor.Start`");
+            new Hook(AccessTools.Method(typeof(MenuPageColor), "Start"), MenuPageColor_StartHook);
             
             logger.LogDebug("Hooking `MenuPageEsc.Start`");
             new Hook(AccessTools.Method(typeof(MenuPageEsc), "Start"), MenuPageEsc_StartHook);
