@@ -11,7 +11,11 @@ namespace MenuLib;
 
 public static class MenuAPI
 {
-    internal static BuilderDelegate mainMenuBuilderDelegates, lobbyMenuBuilderDelegate, escapeMenuBuilderDelegates;
+    internal static BuilderDelegate mainMenuBuilderDelegate,
+        settingsMenuBuilderDelegate,
+        colorMenuBuilderDelegate,
+        lobbyMenuBuilderDelegate,
+        escapeMenuBuilderDelegate;
 
     internal static readonly Dictionary<MenuPage, REPOPopupPage> customMenuPages = [];
 
@@ -20,13 +24,19 @@ public static class MenuAPI
     public delegate void BuilderDelegate(Transform parent);
 
     public static void AddElementToMainMenu(BuilderDelegate builderDelegate) =>
-        mainMenuBuilderDelegates += builderDelegate;
+        mainMenuBuilderDelegate += builderDelegate;
+    
+    public static void AddElementToSettingsMenu(BuilderDelegate builderDelegate) =>
+        settingsMenuBuilderDelegate += builderDelegate;
+    
+    public static void AddElementToColorMenu(BuilderDelegate builderDelegate) =>
+        colorMenuBuilderDelegate += builderDelegate;
 
     public static void AddElementToLobbyMenu(BuilderDelegate builderDelegate) =>
         lobbyMenuBuilderDelegate += builderDelegate;
 
     public static void AddElementToEscapeMenu(BuilderDelegate builderDelegate) =>
-        escapeMenuBuilderDelegates += builderDelegate;
+        escapeMenuBuilderDelegate += builderDelegate;
 
     public static void CloseAllPagesAddedOnTop() => MenuManager.instance.PageCloseAllAddedOnTop();
 
