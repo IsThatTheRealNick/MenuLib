@@ -23,6 +23,8 @@ public sealed class REPOPopupPage : MonoBehaviour
     public MenuScrollBox menuScrollBox;
     public REPOScrollView scrollView;
 
+    public bool ignoreEsc;
+
     public bool pageDimmerVisibility
     {
         get => pageDimmerGameObject.gameObject.activeSelf;
@@ -172,7 +174,7 @@ public sealed class REPOPopupPage : MonoBehaviour
     {
         var pageState = (MenuPage.PageState) REPOReflection.menuPage_CurrentPageState.GetValue(menuPage);
         
-        if (!SemiFunc.InputDown(InputKey.Back) || pageState == MenuPage.PageState.Closing)
+        if (ignoreEsc || !SemiFunc.InputDown(InputKey.Back) || pageState == MenuPage.PageState.Closing)
             return;
         
         ClosePage(false);

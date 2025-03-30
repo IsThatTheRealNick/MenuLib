@@ -215,15 +215,16 @@ public static class MenuAPI
     [Obsolete("Switch to the overload with the 'shouldCachePage' argument!")]
     public static REPOPopupPage CreateREPOPopupPage(string headerText, bool pageDimmerVisibility = false, float spacing = 0, Vector2? localPosition = null) => CreateREPOPopupPage(headerText, false, pageDimmerVisibility, spacing, localPosition);
 
-    public static REPOPopupPage CreateREPOPopupPage(string headerText, REPOPopupPage.PresetSide presetSide, bool shouldCachePage, bool pageDimmerVisibility = false, float spacing = 0) => CreateREPOPopupPage(headerText, shouldCachePage, pageDimmerVisibility, spacing, presetSide == REPOPopupPage.PresetSide.Left ? null : new Vector2(40, 0));
+    public static REPOPopupPage CreateREPOPopupPage(string headerText, REPOPopupPage.PresetSide presetSide, bool shouldCachePage, bool pageDimmerVisibility = false, float spacing = 0, bool ignoreEsc = false) => CreateREPOPopupPage(headerText, shouldCachePage, pageDimmerVisibility, spacing, presetSide == REPOPopupPage.PresetSide.Left ? null : new Vector2(40, 0), ignoreEsc);
 
-    public static REPOPopupPage CreateREPOPopupPage(string headerText, bool shouldCachePage, bool pageDimmerVisibility = false, float spacing = 0, Vector2? localPosition = null)
+    public static REPOPopupPage CreateREPOPopupPage(string headerText, bool shouldCachePage, bool pageDimmerVisibility = false, float spacing = 0, Vector2? localPosition = null, bool ignoreEsc = false)
     {
         var newRectTransform = Object.Instantiate(REPOTemplates.popupPageTemplate, MenuHolder.instance.transform);
         newRectTransform.name = $"Menu Page {headerText}";
 
         var repoPopupPage = newRectTransform.gameObject.AddComponent<REPOPopupPage>();
 
+        repoPopupPage.ignoreEsc = ignoreEsc;
         repoPopupPage.rectTransform.localPosition = localPosition ?? new Vector2(-280, 0);
         repoPopupPage.headerTMP.text = headerText;
         repoPopupPage.isCachedPage = shouldCachePage;
