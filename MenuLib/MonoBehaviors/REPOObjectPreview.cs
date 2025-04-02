@@ -24,10 +24,12 @@ public sealed class REPOObjectPreview : REPOElement
     
     private void Awake()
     {
+        var previewSize = new Vector2(123f, 230f);
         rectTransform = gameObject.AddComponent<RectTransform>();
         rectTransform.pivot = Vector2.right;
         rectTransform.anchorMin = rectTransform.anchorMax = Vector2.zero;
-        rectTransform.sizeDelta = new Vector2(184f, 345f);
+        rectTransform.sizeDelta = previewSize;
+        gameObject.transform.Find("Player Avatar Render Texture").GetComponent<RectTransform>().sizeDelta = previewSize;
 
         playerAvatarMenu = GetComponentInChildren<PlayerAvatarMenuHover>().playerAvatarMenu;
         playerAvatarMenu.cameraAndStuff.GetComponentInChildren<Camera>().farClipPlane = 100;
