@@ -3,7 +3,7 @@ A library for creating UI!
 
 As REPOConfig gets updated, so will this library.
 
-## For Developers - VERSION 2.0.0
+## For Developers - VERSION 2.x.x
 You can reference the [REPOConfig GitHub](https://github.com/IsThatTheRealNick/REPOConfig).  
 Official documentation will come later (sorry), but here's a super quick code snippet:
 
@@ -13,45 +13,50 @@ MenuAPI.AddElementToMainMenu(parent =>
 	//`parent` in this scenario represents the MainMenu
 	
 	//Buttons
-	var repoButton = MenuAPI.CreateREPOButton("A Button", () => Debug.Log("I was clicked!"), parent, Vector2.zero);
+	var repoButton = MenuAPI.CreateREPOButton("A Button", () => Debug.Log("I was clicked!"), parent, localPosition: Vector2.zero);
 	
 	//Labels
-	var repoLabel = MenuAPI.CreateREPOLabel("A Label", parent, new Vector2(48.3f, 55.5f));
+	var repoLabel = MenuAPI.CreateREPOLabel("A Label", parent, localPosition: new Vector2(48.3f, 55.5f));
 	
 	//Toggles
 	var repoToggle = MenuAPI.CreateREPOToggle("A Toggle", b => Debug.Log($"I was switched to: {b}"), parent, Vector2.zero, "Left Button Text", "Right Button Text", defaultValue: true);
 	
+	//Avatar Previews
+	var repoAvatarPreview = MenuAPI.CreateREPOAvatarPreview(parent, new Vector2(48.3f, 55.5f), enableBackgroundImage: true, backgroundImageColor: Color.white);
+	
 	//Sliders
-	//The precision argument/field is the number of decimals you want (0 for int)
+	//The precision argument/field is the number of decimals you want (0 = integers, 1 = 0.1, 2 = 0.01, etc.)
 	//The bar behavior argument/field is for the background bar visual, it doesn't affect functionality
 	//The rest should be self-explanatory
 	
 	//Float Slider
-	var repoFloatSlider = MenuAPI.CreateREPOSlider("Float Slider", "Description", f => Debug.Log($"New Float Value: {f}"), parent, Vector2.zero, -100f, 100f, 2, 50f, "prefix-", "-postfix", REPOSlider.BarBehavior.UpdateWithValue);
+	var repoFloatSlider = MenuAPI.CreateREPOSlider("Float Slider", "Description", f => Debug.Log($"New Float Value: {f}"), parent, localPosition: Vector2.zero, min: -100f, max: 100f, precision: 2, defaultValue: 50f, "prefix-", "-postfix", REPOSlider.BarBehavior.UpdateWithValue);
 
 	//Int Slider (No precision argument)
-	var repoIntSliderSlider = MenuAPI.CreateREPOSlider("Int Slider", "Description", i => Debug.Log($"New Int Value: {i}"), parent, Vector2.zero, -100, 100, 50, "prefix-", "-postfix", REPOSlider.BarBehavior.UpdateWithValue);
+	var repoIntSliderSlider = MenuAPI.CreateREPOSlider("Int Slider", "Description", i => Debug.Log($"New Int Value: {i}"), parent, localPosition: Vector2.zero, min: -100, max: 100, defaultValue: 50, "prefix-", "-postfix", REPOSlider.BarBehavior.UpdateWithValue);
 	
 	//String Option Slider - Alternatively, you can use an int delegate -----------------> (int i) => Debug.Log($"New String Index Value: {i}")
-	var repoStringSlider = MenuAPI.CreateREPOSlider("String Option Slider", "Description", (string s) => Debug.Log($"New String Value: {s}"), parent, ["Option A", "Option B", "Option C"], "a", Vector2.zero, "prefix-", "-postfix", REPOSlider.BarBehavior.UpdateWithValue);
+	var repoStringSlider = MenuAPI.CreateREPOSlider("String Option Slider", "Description", (string s) => Debug.Log($"New String Value: {s}"), parent, stringOptions: ["Option A", "Option B", "Option C"], defaultOption: "a", localPosition: Vector2.zero, "prefix-", "-postfix", REPOSlider.BarBehavior.UpdateWithValue);
 	
-	//Popup Page - These should be created and opened immediately (usually on a button press), trying to cache them will cause issues
-	var repoPage = MenuAPI.CreateREPOPopupPage("Page Header", REPOPopupPage.PresetSide.Left, pageDimmerVisibility: true, spacing: 1.5f);
+	//Popup Page
+	//If caching is disabled then the page should be created on a button's press
+	//If caching is enabled then you should assign it to a field and only create the page if the fields null, otherwise menus will duplicate over time
+	var repoPage = MenuAPI.CreateREPOPopupPage("Page Header", REPOPopupPage.PresetSide.Left, shouldCachePage: false, pageDimmerVisibility: true, spacing: 1.5f);
 	
 	//Popup Page Custom Position
-	var repoPage = MenuAPI.CreateREPOPopupPage("Page Header", true, 1.5f, Vector2.zero);
+	var repoPage = MenuAPI.CreateREPOPopupPage("Page Header", shouldCachePage: false, pageDimmerVisibility: true, spacing: 1.5f, localPosition: Vector2.zero);
 	
-	//Opens page exclusively, the previous page will be inactive
-	repoPage.OpenPage(false);
+	//Opens the page
+	//openOnTop:
+	//If true, the previous page will not be set to inactive
+	//If false, the previous page will be set to inactive
+	repoPage.OpenPage(openOnTop: false);
 	
-	//Opens page inclusively, the previous page will still be active
-	repoPage.OpenPage(true);
-	
-	//Closes page exclusively, only this page will close
-	repoPage.ClosePage(false);
-	
-	//Closes this page + all pages added on top
-	repoPage.ClosePage(true);
+	//Closes this page
+	//closePagesAddedOnTop:
+	//If true, all pages added on top will close too
+	//If false, only this page will close
+	repoPage.ClosePage(closePagesAddedOnTop: false);
 	
 	//Sets the padding for the scroll box mask
 	repoPage.maskPadding = new Padding(left: 0, top: 0, right: 0, bottom: 0);
@@ -73,7 +78,7 @@ MenuAPI.AddElementToMainMenu(parent =>
 	});
 	
 	//Each element has access to its scroll view element, it will be null if it wasn't parented to a scroll box
-	var repoButton = MenuAPI.CreateREPOButton("A Button", () => Debug.Log("I was clicked!"), scrollView, Vector2.zero);
+	var repoButton = MenuAPI.CreateREPOButton("A Button", () => Debug.Log("I was clicked!"), parent: scrollView, localPosition: Vector2.zero);
 
 	var scrollViewElement = repoButton.repoScrollViewElement;
 	
