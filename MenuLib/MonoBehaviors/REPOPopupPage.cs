@@ -12,7 +12,7 @@ public sealed class REPOPopupPage : MonoBehaviour
         Left,
         Right
     }
- 
+
     public delegate RectTransform ScrollViewBuilderDelegate(Transform scrollView);
 
     public RectTransform rectTransform;
@@ -30,7 +30,7 @@ public sealed class REPOPopupPage : MonoBehaviour
     }
 
     public bool isCachedPage { get; internal set; }
-
+    
     public float pageDimmerOpacity
     {
         get => pageDimmerRawImage.color.a;
@@ -61,6 +61,8 @@ public sealed class REPOPopupPage : MonoBehaviour
             UpdateScrollBarPosition();
         }
     }
+
+    public bool closeMenuOnEscape = true;
 
     internal bool pageWasActivatedOnce;
     
@@ -170,6 +172,9 @@ public sealed class REPOPopupPage : MonoBehaviour
 
     private void Update()
     {
+        if (!closeMenuOnEscape)
+            return;
+        
         var pageState = (MenuPage.PageState) REPOReflection.menuPage_CurrentPageState.GetValue(menuPage);
         
         if (!SemiFunc.InputDown(InputKey.Back) || pageState == MenuPage.PageState.Closing)
