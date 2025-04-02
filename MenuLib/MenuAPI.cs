@@ -261,7 +261,7 @@ public static class MenuAPI
     public static REPOObjectPreview CreateREPOObjectPreview(Transform parent, Vector2 localPosition = default, GameObject previewObject = null)
     {
         var newTransform = Object.Instantiate(REPOTemplates.avatarPreviewTemplate, parent);
-        newTransform.name = "Player Avatar Preview";
+        newTransform.name = "Object Preview";
 
         var repoObjectPreview = newTransform.gameObject.AddComponent<REPOObjectPreview>();
 
