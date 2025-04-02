@@ -78,10 +78,6 @@ public sealed class REPOObjectPreview : REPOElement
             // Dispose of rigidbody after getting the center
             Destroy(rb);
         }
-
-        // Fix for clown
-        var physGrabObjectGrabArea = _previewObject.GetComponentInChildren<PhysGrabObjectGrabArea>();
-        if (physGrabObjectGrabArea != null) Destroy(physGrabObjectGrabArea.gameObject);
         
         // Set the object's position and rotation
         _previewObject.transform.localRotation = Quaternion.identity;
