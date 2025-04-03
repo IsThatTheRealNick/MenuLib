@@ -257,6 +257,19 @@ public static class MenuAPI
         
         return repoAvatarPreview;
     }
+
+    public static REPOObjectPreview CreateREPOObjectPreview(Transform parent, Vector2 localPosition = default, GameObject previewObject = null)
+    {
+        var newTransform = Object.Instantiate(REPOTemplates.avatarPreviewTemplate, parent);
+        newTransform.name = "Object Preview";
+
+        var repoObjectPreview = newTransform.gameObject.AddComponent<REPOObjectPreview>();
+
+        repoObjectPreview.rectTransform.localPosition = localPosition;
+        repoObjectPreview.previewObject = previewObject;
+        
+        return repoObjectPreview;
+    }
     
     internal static void OpenMenuPage(MenuPage menuPage, bool pageOnTop)
     {
