@@ -17,28 +17,46 @@ public sealed class REPOAvatarPreview : REPOElement
         set => backgroundImage.color = value;
     }
 
+    public Vector2 previewSize
+    {
+        get => rectTransform.sizeDelta;
+        set
+        {
+            const float ASPECT_RATIO = 0.53333336f;
+            
+            if (value.x > value.y)
+                value = value with { y = value.x / ASPECT_RATIO };
+            else
+                value = value with { x = value.y * ASPECT_RATIO };
+            
+            renderTextureRectTransform.sizeDelta = rectTransform.sizeDelta = value;
+            renderTextureRectTransform.localPosition = Vector3.zero;
+        }
+    }
+    
     public PlayerAvatarVisuals playerAvatarVisuals { get; private set; }
 
     public Transform rigTransform => playerAvatarVisuals.meshParent.transform;
     
     private PlayerAvatarMenu playerAvatarMenu;
     private Image backgroundImage;
+    private RectTransform renderTextureRectTransform;
     
     private void Awake()
     {
         rectTransform = gameObject.AddComponent<RectTransform>();
         rectTransform.pivot = Vector2.right;
         rectTransform.anchorMin = rectTransform.anchorMax = Vector2.zero;
-        rectTransform.sizeDelta = new Vector2(184f, 345f);
 
+        renderTextureRectTransform = (RectTransform) rectTransform.GetChild(1);
+        renderTextureRectTransform.localPosition = Vector3.zero;
+        
         playerAvatarMenu = GetComponentInChildren<PlayerAvatarMenuHover>().playerAvatarMenu;
         playerAvatarVisuals = playerAvatarMenu.GetComponentInChildren<PlayerAvatarVisuals>();
         
         backgroundImage = gameObject.AddComponent<Image>();
         backgroundImage.enabled = false;
     }
-
-    private void Start() => rectTransform.GetChild(0).localPosition = Vector3.zero;
 
     private void OnDestroy()
     {

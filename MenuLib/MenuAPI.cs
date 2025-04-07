@@ -255,10 +255,12 @@ public static class MenuAPI
         repoAvatarPreview.enableBackgroundImage = enableBackgroundImage;
         repoAvatarPreview.backgroundImageColor = backgroundImageColor ?? Color.white;
         
+        repoAvatarPreview.previewSize = new Vector2(184f, 345f);
+        
         return repoAvatarPreview;
     }
 
-    public static REPOObjectPreview CreateREPOObjectPreview(Transform parent, Vector2 localPosition = default, GameObject previewObject = null)
+    public static REPOObjectPreview CreateREPOObjectPreview(Transform parent, GameObject previewObject, Vector2 localPosition = default, bool enableBackgroundImage = false, Color? backgroundImageColor = null)
     {
         var newTransform = Object.Instantiate(REPOTemplates.avatarPreviewTemplate, parent);
         newTransform.name = "Object Preview";
@@ -266,7 +268,11 @@ public static class MenuAPI
         var repoObjectPreview = newTransform.gameObject.AddComponent<REPOObjectPreview>();
 
         repoObjectPreview.rectTransform.localPosition = localPosition;
+        repoObjectPreview.enableBackgroundImage = enableBackgroundImage;
+        repoObjectPreview.backgroundImageColor = backgroundImageColor ?? Color.white;
         repoObjectPreview.previewObject = previewObject;
+        
+        repoObjectPreview.previewSize = new Vector2(184f, 345f);
         
         return repoObjectPreview;
     }
