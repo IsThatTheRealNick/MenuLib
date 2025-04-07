@@ -1,4 +1,5 @@
-﻿using MenuLib.Structs;
+﻿using System;
+using MenuLib.Structs;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,6 +15,8 @@ public sealed class REPOPopupPage : MonoBehaviour
     }
 
     public delegate RectTransform ScrollViewBuilderDelegate(Transform scrollView);
+
+    public delegate bool InterceptMenuClosingDelegate();
 
     public RectTransform rectTransform;
     public RectTransform maskRectTransform;
@@ -62,7 +65,10 @@ public sealed class REPOPopupPage : MonoBehaviour
         }
     }
 
+    [Obsolete("Use onEscapePressed instead.")]
     public bool closeMenuOnEscape = true;
+
+    public InterceptMenuClosingDelegate onEscapePressed;
 
     internal bool pageWasActivatedOnce;
     
@@ -180,6 +186,9 @@ public sealed class REPOPopupPage : MonoBehaviour
         if (!SemiFunc.InputDown(InputKey.Back) || pageState == MenuPage.PageState.Closing)
             return;
         
+        if (onEscapePressed?.Invoke() == true)
+            return;
+            
         ClosePage(false);
     }
 
