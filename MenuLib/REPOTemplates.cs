@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace MenuLib;
 
@@ -16,7 +17,12 @@ internal static class REPOTemplates
 
     static REPOTemplates()
     {
-        var menuPages = MenuManager.instance.menuPages;
+        var menuManager = MenuManager.instance;
+
+        if (!menuManager)
+            throw new NullReferenceException("Error fetching templates... Ensure you're not creating UI elements too early, use \"MenuAPI.AddElementTo...\"");
+        
+        var menuPages = menuManager.menuPages;
 
         foreach (var menuPageData in menuPages)
         {

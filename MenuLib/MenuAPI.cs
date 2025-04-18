@@ -40,6 +40,7 @@ public static class MenuAPI
 
     public static void CloseAllPagesAddedOnTop() => MenuManager.instance.PageCloseAllAddedOnTop();
 
+    //Rewrite with blank pages
     public static void OpenPopup(string header, Color headerColor, string content, Action onLeftClicked, Action onRightClicked = null)
     {
         if (!menuButtonPopup)
@@ -53,8 +54,7 @@ public static class MenuAPI
 
         if (onRightClicked != null)
             menuButtonPopup.option2Event.AddListener(new UnityAction(onRightClicked));
-
-        //Setting the text in here doesn't work
+        
         MenuManager.instance.PagePopUpTwoOptions(menuButtonPopup, header, headerColor, content, "Yes", "No");
     }
 
@@ -91,6 +91,22 @@ public static class MenuAPI
         return repoToggle;
     }
 
+    public static REPOInputField CreateREPOInputField(string text, Action<string> onValueChanged, Transform parent, Vector2 localPosition = default, bool delayOnValueChanged = false, string defaultValue = "")
+    {
+        var newRectTransform = Object.Instantiate(REPOTemplates.toggleTemplate, parent);
+        newRectTransform.name = $"Menu Input Field - {text}";
+        
+        newRectTransform.localPosition = localPosition;
+
+        var repoInputField = newRectTransform.gameObject.AddComponent<REPOInputField>();
+
+        repoInputField.labelTMP.text = text;
+        repoInputField.inputStringSystem.onValueChanged = onValueChanged;
+        repoInputField.inputStringSystem.SetValue(defaultValue, false);
+        
+        return repoInputField;
+    }
+    
     public static REPOSlider CreateREPOSlider(string text, string description, Action<float> onValueChanged, Transform parent, Vector2 localPosition = default, float min = 0f, float max = 1f, int precision = 2, float defaultValue = 0f, string prefix = "", string postfix = "", REPOSlider.BarBehavior barBehavior = REPOSlider.BarBehavior.UpdateWithValue)
     {
         var newRectTransform = Object.Instantiate(REPOTemplates.sliderTemplate, parent);
@@ -240,7 +256,6 @@ public static class MenuAPI
         repoPopupPage.pageDimmerVisibility = pageDimmerVisibility;
         repoPopupPage.scrollView.spacing = spacing;
         
-        customMenuPages.Add(repoPopupPage.menuPage, repoPopupPage);
         return repoPopupPage;
     }
 

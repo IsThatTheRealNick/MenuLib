@@ -36,11 +36,11 @@ public sealed class REPOToggle : REPOElement
         optionBox = (RectTransform) transform.Find("Option Box");
         optionBoxBehind = (RectTransform) transform.Find("Option Box Behind");
 
+        labelTMP.rectTransform.sizeDelta -= new Vector2(0, 10);        
+        
         var horizontalShift = Vector3.right * 100f;
         
         transform.Find("SliderBG").localPosition += horizontalShift;
-
-        labelTMP.rectTransform.sizeDelta -= new Vector2(0, 4);
 
         labelTMP.rectTransform.localPosition += horizontalShift;
 

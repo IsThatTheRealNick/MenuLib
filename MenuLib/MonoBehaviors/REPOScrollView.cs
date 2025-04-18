@@ -67,7 +67,8 @@ public sealed class REPOScrollView : MonoBehaviour
                 break;
         }
         
-        REPOReflection.menuScrollBox_ScrollerStartPosition.SetValue(menuScrollBox, Math.Abs(lastElementYPosition / (1f - 0.55f * menuScrollBox.scrollHandle.rect.height / menuScrollBox.scrollBarBackground.rect.height)));
+        
+        REPOReflection.menuScrollBox_ScrollerStartPosition.SetValue(menuScrollBox, Math.Abs(lastElementYPosition / (1 - menuScrollBox.scrollHandle.rect.height / menuScrollBox.scrollBarBackground.rect.height)));
     }
 
     public void SetScrollPosition(float normalizedPosition)

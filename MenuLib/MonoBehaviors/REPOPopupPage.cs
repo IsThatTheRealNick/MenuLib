@@ -163,6 +163,8 @@ public sealed class REPOPopupPage : MonoBehaviour
         maskPadding = new Padding(0, 0, 0, 25);
         
         Destroy(GetComponent<MenuPageSettingsPage>());
+        
+        MenuAPI.customMenuPages.Add(menuPage, this);
     }
     
     private void Start()
@@ -174,6 +176,8 @@ public sealed class REPOPopupPage : MonoBehaviour
         
         if (!pageWasActivatedOnce)
             menuPage.PageStateSet(MenuPage.PageState.Closing);
+        
+        scrollView.SetScrollPosition(0);
     }
 
     private void Update()
@@ -191,6 +195,8 @@ public sealed class REPOPopupPage : MonoBehaviour
             
         ClosePage(false);
     }
+
+    private void OnDestroy() => MenuAPI.customMenuPages.Remove(menuPage);
 
     private void UpdateScrollBarPosition()
     {
