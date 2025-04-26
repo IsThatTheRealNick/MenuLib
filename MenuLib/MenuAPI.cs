@@ -61,7 +61,7 @@ public static class MenuAPI
     public static REPOButton CreateREPOButton(string text, Action onClick, Transform parent, Vector2 localPosition = default)
     {
         var newRectTransform = Object.Instantiate(REPOTemplates.buttonTemplate, parent);
-        newRectTransform.name = $"Menu Button - {text}";
+        newRectTransform.name = $"Button - {text}";
 
         newRectTransform.localPosition = localPosition;
 
@@ -76,7 +76,7 @@ public static class MenuAPI
     public static REPOToggle CreateREPOToggle(string text, Action<bool> onToggle, Transform parent, Vector2 localPosition = default, string leftButtonText = "ON", string rightButtonText = "OFF", bool defaultValue = false)
     {
         var newRectTransform = Object.Instantiate(REPOTemplates.toggleTemplate, parent);
-        newRectTransform.name = $"Menu Toggle - {text}";
+        newRectTransform.name = $"Toggle - {text}";
 
         newRectTransform.localPosition = localPosition;
 
@@ -91,17 +91,19 @@ public static class MenuAPI
         return repoToggle;
     }
 
-    public static REPOInputField CreateREPOInputField(string text, Action<string> onValueChanged, Transform parent, Vector2 localPosition = default, bool delayOnValueChanged = false, string defaultValue = "")
+    public static REPOInputField CreateREPOInputField(string labelText, Action<string> onValueChanged, Transform parent, Vector2 localPosition = default, bool onlyNotifyOnSubmit = false, string placeholder = "", string defaultValue = "")
     {
         var newRectTransform = Object.Instantiate(REPOTemplates.toggleTemplate, parent);
-        newRectTransform.name = $"Menu Input Field - {text}";
+        newRectTransform.name = $"Input Field - {labelText}";
         
         newRectTransform.localPosition = localPosition;
 
         var repoInputField = newRectTransform.gameObject.AddComponent<REPOInputField>();
 
-        repoInputField.labelTMP.text = text;
+        repoInputField.labelTMP.text = labelText;
         repoInputField.inputStringSystem.onValueChanged = onValueChanged;
+        repoInputField.inputStringSystem.onlyNotifyOnSubmit = onlyNotifyOnSubmit;
+        repoInputField.inputStringSystem.placeholder = placeholder;
         repoInputField.inputStringSystem.SetValue(defaultValue, false);
         
         return repoInputField;

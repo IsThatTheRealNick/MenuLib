@@ -2,6 +2,7 @@
 using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
+using MenuLib.MonoBehaviors;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
@@ -10,7 +11,7 @@ using Object = UnityEngine.Object;
 
 namespace MenuLib;
 
-[BepInPlugin("nickklmao.menulib", MOD_NAME, "2.3.0")]
+[BepInPlugin("nickklmao.menulib", MOD_NAME, "2.4.0")]
 internal sealed class Entry : BaseUnityPlugin
 {
     private const string MOD_NAME = "Menu Lib";
@@ -150,7 +151,7 @@ internal sealed class Entry : BaseUnityPlugin
         cursor.Emit(OpCodes.Ldarg_0);
         cursor.Emit<MenuScrollBox>(OpCodes.Ldfld, "parentPage");
         cursor.EmitDelegate((MenuScrollBox menuScrollBox, MenuPage menuPage) => {
-            var yMovementInput = SemiFunc.InputMovementY();
+            var yMovementInput = SemiFunc.InputMovementY() / 20f;
             var yMouseScroll = SemiFunc.InputScrollY();
 
             float amountToScroll;
@@ -165,7 +166,7 @@ internal sealed class Entry : BaseUnityPlugin
             else
             {
                 var scrollHeight = (float) REPOReflection.menuScrollBox_ScrollHeight.GetValue(menuScrollBox);
-                amountToScroll = yMovementInput * 20f / (scrollHeight * 0.01f) + yMouseScroll / (scrollHeight * 0.01f);
+                amountToScroll = yMovementInput / (scrollHeight * 0.01f) + yMouseScroll / (scrollHeight * 0.01f);
             }
              
             var currentHandlePosition = (float) REPOReflection.menuScrollBox_ScrollHandleTargetPosition.GetValue(menuScrollBox);
@@ -201,6 +202,21 @@ internal sealed class Entry : BaseUnityPlugin
             REPOReflection.menuScrollBox_ScrollAmount.SetValue(instance, scrollAmount);
         });
     }
+    
+    private static void ChatManager_StateInactiveILHook(ILContext il)
+    {
+        var cursor = new ILCursor(il);
+
+        cursor.GotoNext(MoveType.After, instruction => instruction.MatchStfld<ChatManager>("chatActive"));
+        
+        var label = cursor.DefineLabel();
+        
+        cursor.Emit<REPOInputStringSystem>(OpCodes.Ldsfld, "hasAnyFocus");
+        cursor.Emit(OpCodes.Brfalse_S, label);
+        cursor.Emit(OpCodes.Ret);
+
+        cursor.MarkLabel(label);
+    }
         
     private void Awake()
     {
@@ -227,5 +243,8 @@ internal sealed class Entry : BaseUnityPlugin
             
         logger.LogDebug("Hooking `MenuScrollBox.Update`");
         new ILHook(AccessTools.Method(typeof(MenuScrollBox), "Update"), MenuScrollBox_UpdateILHook);
+        
+        logger.LogDebug("Hooking `ChatManager.StateInactive`");
+        new ILHook(AccessTools.Method(typeof(ChatManager), "StateInactive"), ChatManager_StateInactiveILHook);
     }
 }

@@ -16,7 +16,7 @@ public sealed class REPOPopupPage : MonoBehaviour
 
     public delegate RectTransform ScrollViewBuilderDelegate(Transform scrollView);
 
-    public delegate bool InterceptMenuClosingDelegate();
+    public delegate bool ShouldCloseMenuDelegate();
 
     public RectTransform rectTransform;
     public RectTransform maskRectTransform;
@@ -68,7 +68,7 @@ public sealed class REPOPopupPage : MonoBehaviour
     [Obsolete("Use onEscapePressed instead.")]
     public bool closeMenuOnEscape = true;
 
-    public InterceptMenuClosingDelegate onEscapePressed;
+    public ShouldCloseMenuDelegate onEscapePressed;
 
     internal bool pageWasActivatedOnce;
     
@@ -190,10 +190,8 @@ public sealed class REPOPopupPage : MonoBehaviour
         if (!SemiFunc.InputDown(InputKey.Back) || pageState == MenuPage.PageState.Closing)
             return;
         
-        if (onEscapePressed?.Invoke() == true)
-            return;
-            
-        ClosePage(false);
+        if (onEscapePressed == null || onEscapePressed.Invoke())
+            ClosePage(false);
     }
 
     private void OnDestroy() => MenuAPI.customMenuPages.Remove(menuPage);

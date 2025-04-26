@@ -8,7 +8,7 @@ namespace MenuLib.MonoBehaviors;
 public sealed class REPOInputField : REPOElement
 {
     public TextMeshProUGUI labelTMP;
-
+    
     public REPOInputStringSystem inputStringSystem;
 
     private RectTransform inputAreaRectTransform;

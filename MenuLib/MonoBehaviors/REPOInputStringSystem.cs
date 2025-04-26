@@ -18,6 +18,8 @@ public sealed class REPOInputStringSystem : MonoBehaviour
 
         public Colors() { }
     }
+
+    public static bool hasAnyFocus;
     
     public TMP_Text inputTMP;
     public RectTransform maskRectTransform;
@@ -29,7 +31,7 @@ public sealed class REPOInputStringSystem : MonoBehaviour
     public string currentValue { get; private set; }
     public string placeholder = string.Empty;
     
-    public bool notifyOnSubmit;
+    public bool onlyNotifyOnSubmit;
     public bool isHovering { get; private set; }
 
     public bool isFocused
@@ -51,13 +53,18 @@ public sealed class REPOInputStringSystem : MonoBehaviour
                     else
                         MoveTMP(true, -inputTMP.GetPreferredValues($"{currentValue}<b>|</b>").x + maskRectTransform.rect.width - 6);
                     
+                    
+                    ChatUI.instance.Hide();
+                    
                     break;
                 }
             }
 
-            _isFocused = value;
+            hasAnyFocus = _isFocused = value;
         }
     }
+
+    public bool disableMovement = true;
     
     private string previousValue;
 
@@ -88,6 +95,9 @@ public sealed class REPOInputStringSystem : MonoBehaviour
     {
         if (!inputTMP)
             return;
+
+        if (disableMovement && isFocused)
+            InputManager.instance?.DisableMovement();
         
         HandleInput();
         UpdateColors();
@@ -97,11 +107,11 @@ public sealed class REPOInputStringSystem : MonoBehaviour
             isFocused = false;
             pressedSubmit = false;
             
-            if (notifyOnSubmit)
+            if (onlyNotifyOnSubmit)
                 onValueChanged?.Invoke(currentValue);
         }
         
-        if (!notifyOnSubmit && previousValue != currentValue)
+        if (!onlyNotifyOnSubmit && previousValue != currentValue)
             onValueChanged?.Invoke(currentValue);
         
         if (isFocused)
@@ -118,6 +128,8 @@ public sealed class REPOInputStringSystem : MonoBehaviour
         previousValue = currentValue;
     }
 
+    private void OnDestroy() => hasAnyFocus = false;
+
     private void HandleInput()
     {
         if (timeSinceCharacterAdded < 1)
@@ -126,11 +138,38 @@ public sealed class REPOInputStringSystem : MonoBehaviour
         if (timeSinceCharacterRemoved < 1)
             timeSinceCharacterRemoved += Time.deltaTime;
         
-        if (!isFocused || Keyboard.current.ctrlKey.isPressed)
+        if (!isFocused)
             return;
         
-        var character = Input.inputString;
         var previousString = currentValue;
+        
+        if (Keyboard.current.ctrlKey.isPressed)
+        {
+            if (Keyboard.current.cKey.wasPressedThisFrame)
+                GUIUtility.systemCopyBuffer = currentValue;
+            else if (Keyboard.current.xKey.wasPressedThisFrame)
+            {
+                GUIUtility.systemCopyBuffer = currentValue;
+                currentValue = null;
+                timeSinceCharacterRemoved = 0;
+                
+                MoveTMP(true);
+            }
+            else if (Keyboard.current.vKey.wasPressedThisFrame)
+            {
+                currentValue += GUIUtility.systemCopyBuffer.Replace("\n", string.Empty);
+                timeSinceCharacterAdded = 0;
+                
+                if (IsTMPInMask())
+                    MoveTMP(true);
+                else
+                    MoveTMP(true, -inputTMP.GetPreferredValues($"{currentValue}<b>|</b>").x + maskRectTransform.rect.width - 6);
+            }
+            
+            return;
+        }
+        
+        var character = Input.inputString;
         
         switch (character)
         {
