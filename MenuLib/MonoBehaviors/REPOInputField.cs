@@ -59,8 +59,9 @@ public sealed class REPOInputField : REPOElement
                 }
             }
         }
-
+        
         inputTMP!.rectTransform.pivot = Vector2.zero;
+        inputTMP.fontStyle = FontStyles.Normal;
 
         inputTMP.enableAutoSizing = false;
         inputTMP.alignment = TextAlignmentOptions.Left;

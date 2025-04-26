@@ -129,8 +129,11 @@ public sealed class REPOSlider : REPOElement
         labelTMP = GetComponentInChildren<TextMeshProUGUI>();
         descriptionTMP = transform.Find("Big Setting Text").GetComponent<TextMeshProUGUI>();
         valueTMP = transform.Find("Bar Text").GetComponent<TextMeshProUGUI>();
+        valueTMP.fontStyle = FontStyles.Normal;
+        
         barMaskRectTransform = (RectTransform) transform.Find("MaskedText"); 
         maskedValueTMP = barMaskRectTransform.GetComponentInChildren<TextMeshProUGUI>();
+        maskedValueTMP.fontStyle = FontStyles.Normal;
         barPointerRectTransform = (RectTransform) transform.Find("Bar Pointer").transform;
         
         var movementShift = new Vector3(5.3f, 0);
