@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<GameBaseDir>E:\SteamLibrary\steamapps\common\REPO</GameBaseDir>
 		<GameAssemblyDir>$(GameBaseDir)\REPO_Data\Managed</GameAssemblyDir>
-		<AssemblyVersion>2.4.1</AssemblyVersion>
+		<AssemblyVersion>2.5.0</AssemblyVersion>
 	</PropertyGroup>
 
     <PropertyGroup>
@@ -34,6 +34,30 @@
       </Reference>
       <Reference Include="MonoMod.Utils">
         <HintPath>$(GameBaseDir)\BepInEx\core\MonoMod.Utils.dll</HintPath>
+      </Reference>
+      <Reference Include="Photon3Unity3D">
+        <HintPath>E:\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\Photon3Unity3D.dll</HintPath>
+      </Reference>
+      <Reference Include="PhotonChat">
+        <HintPath>E:\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\PhotonChat.dll</HintPath>
+      </Reference>
+      <Reference Include="PhotonRealtime">
+        <HintPath>E:\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\PhotonRealtime.dll</HintPath>
+      </Reference>
+      <Reference Include="PhotonUnityNetworking">
+        <HintPath>E:\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\PhotonUnityNetworking.dll</HintPath>
+      </Reference>
+      <Reference Include="PhotonUnityNetworking.Utilities">
+        <HintPath>E:\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\PhotonUnityNetworking.Utilities.dll</HintPath>
+      </Reference>
+      <Reference Include="PhotonVoice">
+        <HintPath>E:\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\PhotonVoice.dll</HintPath>
+      </Reference>
+      <Reference Include="PhotonVoice.API">
+        <HintPath>E:\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\PhotonVoice.API.dll</HintPath>
+      </Reference>
+      <Reference Include="PhotonVoice.PUN">
+        <HintPath>E:\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\PhotonVoice.PUN.dll</HintPath>
       </Reference>
       <Reference Include="Unity.AI.Navigation">
         <HintPath>$(GameAssemblyDir)\Unity.AI.Navigation.dll</HintPath>

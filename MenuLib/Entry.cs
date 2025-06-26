@@ -11,7 +11,7 @@ using Object = UnityEngine.Object;
 
 namespace MenuLib;
 
-[BepInPlugin("nickklmao.menulib", MOD_NAME, "2.4.1")]
+[BepInPlugin("nickklmao.menulib", MOD_NAME, "2.5.0")]
 internal sealed class Entry : BaseUnityPlugin
 {
     private const string MOD_NAME = "Menu Lib";
@@ -40,6 +40,18 @@ internal sealed class Entry : BaseUnityPlugin
     {
         orig.Invoke(self);
         MenuAPI.escapeMenuBuilderDelegate?.Invoke(self.transform);
+    }
+    
+    private static void MenuPageRegions_StartHook(Action<MenuPageRegions> orig, MenuPageRegions self)
+    {
+        orig.Invoke(self);
+        MenuAPI.regionSelectionMenuBuilderDelegate?.Invoke(self.transform);
+    }
+    
+    private static void MenuPageServerList_StartHook(Action<MenuPageServerList> orig, MenuPageServerList self)
+    {
+        orig.Invoke(self);
+        MenuAPI.serverListMenuBuilderDelegate?.Invoke(self.transform);
     }
         
     private static void MenuPageLobby_StartHook(Action<MenuPageLobby> orig, MenuPageLobby self)
@@ -231,7 +243,13 @@ internal sealed class Entry : BaseUnityPlugin
             
         logger.LogDebug("Hooking `MenuPageEsc.Start`");
         new Hook(AccessTools.Method(typeof(MenuPageEsc), "Start"), MenuPageEsc_StartHook);
-            
+        
+        logger.LogDebug("Hooking `MenuPageRegions.Start`");
+        new Hook(AccessTools.Method(typeof(MenuPageRegions), "Start"), MenuPageRegions_StartHook);
+        
+        logger.LogDebug("Hooking `MenuPageServerList.Start`");
+        new Hook(AccessTools.Method(typeof(MenuPageServerList), "Start"), MenuPageServerList_StartHook);
+        
         logger.LogDebug("Hooking `MenuPageLobby.Start`");
         new Hook(AccessTools.Method(typeof(MenuPageLobby), "Start"), MenuPageLobby_StartHook);
         

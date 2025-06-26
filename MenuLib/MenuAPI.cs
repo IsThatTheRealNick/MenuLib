@@ -15,7 +15,9 @@ public static class MenuAPI
         settingsMenuBuilderDelegate,
         colorMenuBuilderDelegate,
         lobbyMenuBuilderDelegate,
-        escapeMenuBuilderDelegate;
+        escapeMenuBuilderDelegate,
+        regionSelectionMenuBuilderDelegate,
+        serverListMenuBuilderDelegate;
 
     internal static readonly Dictionary<MenuPage, REPOPopupPage> customMenuPages = [];
 
@@ -37,10 +39,15 @@ public static class MenuAPI
 
     public static void AddElementToEscapeMenu(BuilderDelegate builderDelegate) =>
         escapeMenuBuilderDelegate += builderDelegate;
+    
+    public static void AddElementToRegionSelectionMenu(BuilderDelegate builderDelegate) =>
+        regionSelectionMenuBuilderDelegate += builderDelegate;
+    
+    public static void AddElementToServerListMenu(BuilderDelegate builderDelegate) =>
+        serverListMenuBuilderDelegate += builderDelegate;
 
     public static void CloseAllPagesAddedOnTop() => MenuManager.instance.PageCloseAllAddedOnTop();
-
-    //Rewrite with blank pages
+    
     public static void OpenPopup(string header, Color headerColor, string content, Action onLeftClicked, Action onRightClicked = null)
     {
         if (!menuButtonPopup)
@@ -55,7 +62,7 @@ public static class MenuAPI
         if (onRightClicked != null)
             menuButtonPopup.option2Event.AddListener(new UnityAction(onRightClicked));
         
-        MenuManager.instance.PagePopUpTwoOptions(menuButtonPopup, header, headerColor, content, "Yes", "No");
+        MenuManager.instance.PagePopUpTwoOptions(menuButtonPopup, header, headerColor, content, "Yes", "No", true);
     }
 
     public static REPOButton CreateREPOButton(string text, Action onClick, Transform parent, Vector2 localPosition = default)
